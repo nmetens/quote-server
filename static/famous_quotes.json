@@ -1,0 +1,502 @@
+[
+  {
+    "id": 0,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 1,
+    "quote": "The greatest thing you'll ever learn is just to love and be loved in return.",
+    "author": "Eden Ahbez"
+  },
+  {
+    "id": 2,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 3,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 4,
+    "quote": "In the middle of every difficulty lies opportunity.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 5,
+    "quote": "Chains do not hold a marriage together. It is threads, hundreds of tiny threads.",
+    "author": "Simone Signoret"
+  },
+  {
+    "id": 6,
+    "quote": "In every conceivable manner, the family is link to our past, bridge to our future.",
+    "author": "Alex Haley"
+  },
+  {
+    "id": 7,
+    "quote": "It is not length of life, but depth of life.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 8,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 9,
+    "quote": "He who angers you conquers you.",
+    "author": "Elizabeth Kenny"
+  },
+  {
+    "id": 10,
+    "quote": "Other things may change us, but we start and end with the family.",
+    "author": "Anthony Brandt"
+  },
+  {
+    "id": 11,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 12,
+    "quote": "Death is not the opposite of life, but a part of it.",
+    "author": "Haruki Murakami"
+  },
+  {
+    "id": 13,
+    "quote": "Death is not the opposite of life, but a part of it.",
+    "author": "Haruki Murakami"
+  },
+  {
+    "id": 14,
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 15,
+    "quote": "Death is not the opposite of life, but a part of it.",
+    "author": "Haruki Murakami"
+  },
+  {
+    "id": 16,
+    "quote": "Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment.",
+    "author": "Buddha"
+  },
+  {
+    "id": 17,
+    "quote": "The love of a family is life’s greatest blessing.",
+    "author": "Unknown"
+  },
+  {
+    "id": 18,
+    "quote": "It is not length of life, but depth of life.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 19,
+    "quote": "Chains do not hold a marriage together. It is threads, hundreds of tiny threads.",
+    "author": "Simone Signoret"
+  },
+  {
+    "id": 20,
+    "quote": "Death is not the opposite of life, but a part of it.",
+    "author": "Haruki Murakami"
+  },
+  {
+    "id": 21,
+    "quote": "It is not length of life, but depth of life.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 22,
+    "quote": "Life is either a daring adventure or nothing at all.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 23,
+    "quote": "A successful marriage requires falling in love many times, always with the same person.",
+    "author": "Mignon McLaughlin"
+  },
+  {
+    "id": 24,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 25,
+    "quote": "A happy family is but an earlier heaven.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 26,
+    "quote": "Let there be spaces in your togetherness.",
+    "author": "Khalil Gibran"
+  },
+  {
+    "id": 27,
+    "quote": "The fear of death follows from the fear of life.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 28,
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 29,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 30,
+    "quote": "In the middle of every difficulty lies opportunity.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 31,
+    "quote": "The greatest thing you'll ever learn is just to love and be loved in return.",
+    "author": "Eden Ahbez"
+  },
+  {
+    "id": 32,
+    "quote": "The fear of death follows from the fear of life.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 33,
+    "quote": "Death is not the opposite of life, but a part of it.",
+    "author": "Haruki Murakami"
+  },
+  {
+    "id": 34,
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 35,
+    "quote": "The greatest thing you'll ever learn is just to love and be loved in return.",
+    "author": "Eden Ahbez"
+  },
+  {
+    "id": 36,
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 37,
+    "quote": "We suffer more in imagination than in reality.",
+    "author": "Seneca"
+  },
+  {
+    "id": 38,
+    "quote": "Marriage is the highest state of friendship.",
+    "author": "Samuel Richardson"
+  },
+  {
+    "id": 39,
+    "quote": "To love and be loved is to feel the sun from both sides.",
+    "author": "David Viscott"
+  },
+  {
+    "id": 40,
+    "quote": "We suffer more in imagination than in reality.",
+    "author": "Seneca"
+  },
+  {
+    "id": 41,
+    "quote": "Marriage is the highest state of friendship.",
+    "author": "Samuel Richardson"
+  },
+  {
+    "id": 42,
+    "quote": "The fear of death follows from the fear of life.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 43,
+    "quote": "Family is not an important thing. It's everything.",
+    "author": "Michael J. Fox"
+  },
+  {
+    "id": 44,
+    "quote": "To love and be loved is to feel the sun from both sides.",
+    "author": "David Viscott"
+  },
+  {
+    "id": 45,
+    "quote": "If it is not right, do not do it, if it is not true, do not say it.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 46,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 47,
+    "quote": "He who angers you conquers you.",
+    "author": "Elizabeth Kenny"
+  },
+  {
+    "id": 48,
+    "quote": "It is not length of life, but depth of life.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 49,
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon"
+  },
+  {
+    "id": 50,
+    "quote": "Love doesn't make the world go 'round. Love is what makes the ride worthwhile.",
+    "author": "Franklin P. Jones"
+  },
+  {
+    "id": 51,
+    "quote": "The greatest thing you'll ever learn is just to love and be loved in return.",
+    "author": "Eden Ahbez"
+  },
+  {
+    "id": 52,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 53,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 54,
+    "quote": "If it is not right, do not do it, if it is not true, do not say it.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 55,
+    "quote": "Life is either a daring adventure or nothing at all.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 56,
+    "quote": "Life is either a daring adventure or nothing at all.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 57,
+    "quote": "In the middle of every difficulty lies opportunity.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 58,
+    "quote": "You have power over your mind - not outside events. Realize this, and you will find strength.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 59,
+    "quote": "He who angers you conquers you.",
+    "author": "Elizabeth Kenny"
+  },
+  {
+    "id": 60,
+    "quote": "In every conceivable manner, the family is link to our past, bridge to our future.",
+    "author": "Alex Haley"
+  },
+  {
+    "id": 61,
+    "quote": "To love and be loved is to feel the sun from both sides.",
+    "author": "David Viscott"
+  },
+  {
+    "id": 62,
+    "quote": "Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment.",
+    "author": "Buddha"
+  },
+  {
+    "id": 63,
+    "quote": "Chains do not hold a marriage together. It is threads, hundreds of tiny threads.",
+    "author": "Simone Signoret"
+  },
+  {
+    "id": 64,
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon"
+  },
+  {
+    "id": 65,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 66,
+    "quote": "The greatest thing you'll ever learn is just to love and be loved in return.",
+    "author": "Eden Ahbez"
+  },
+  {
+    "id": 67,
+    "quote": "Let there be spaces in your togetherness.",
+    "author": "Khalil Gibran"
+  },
+  {
+    "id": 68,
+    "quote": "To love and be loved is to feel the sun from both sides.",
+    "author": "David Viscott"
+  },
+  {
+    "id": 69,
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon"
+  },
+  {
+    "id": 70,
+    "quote": "In the middle of every difficulty lies opportunity.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 71,
+    "quote": "Other things may change us, but we start and end with the family.",
+    "author": "Anthony Brandt"
+  },
+  {
+    "id": 72,
+    "quote": "It is not length of life, but depth of life.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 73,
+    "quote": "Waste no more time arguing what a good man should be. Be one.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 74,
+    "quote": "A happy family is but an earlier heaven.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 75,
+    "quote": "He who angers you conquers you.",
+    "author": "Elizabeth Kenny"
+  },
+  {
+    "id": 76,
+    "quote": "Life is either a daring adventure or nothing at all.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 77,
+    "quote": "The love of a family is life’s greatest blessing.",
+    "author": "Unknown"
+  },
+  {
+    "id": 78,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 79,
+    "quote": "The fear of death follows from the fear of life.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 80,
+    "quote": "Death ends a life, not a relationship.",
+    "author": "Mitch Albom"
+  },
+  {
+    "id": 81,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 82,
+    "quote": "A successful marriage requires falling in love many times, always with the same person.",
+    "author": "Mignon McLaughlin"
+  },
+  {
+    "id": 83,
+    "quote": "Love doesn't make the world go 'round. Love is what makes the ride worthwhile.",
+    "author": "Franklin P. Jones"
+  },
+  {
+    "id": 84,
+    "quote": "To the well-organized mind, death is but the next great adventure.",
+    "author": "J.K. Rowling"
+  },
+  {
+    "id": 85,
+    "quote": "In every conceivable manner, the family is link to our past, bridge to our future.",
+    "author": "Alex Haley"
+  },
+  {
+    "id": 86,
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 87,
+    "quote": "The greatest thing you'll ever learn is just to love and be loved in return.",
+    "author": "Eden Ahbez"
+  },
+  {
+    "id": 88,
+    "quote": "Life is either a daring adventure or nothing at all.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 89,
+    "quote": "To the well-organized mind, death is but the next great adventure.",
+    "author": "J.K. Rowling"
+  },
+  {
+    "id": 90,
+    "quote": "In every conceivable manner, the family is link to our past, bridge to our future.",
+    "author": "Alex Haley"
+  },
+  {
+    "id": 91,
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 92,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 93,
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 94,
+    "quote": "You have power over your mind - not outside events. Realize this, and you will find strength.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 95,
+    "quote": "We suffer more in imagination than in reality.",
+    "author": "Seneca"
+  },
+  {
+    "id": 96,
+    "quote": "Other things may change us, but we start and end with the family.",
+    "author": "Anthony Brandt"
+  },
+  {
+    "id": 97,
+    "quote": "Marriage is not about age; it's about finding the right person.",
+    "author": "Sophia Bush"
+  },
+  {
+    "id": 98,
+    "quote": "Other things may change us, but we start and end with the family.",
+    "author": "Anthony Brandt"
+  },
+  {
+    "id": 99,
+    "quote": "In every conceivable manner, the family is link to our past, bridge to our future.",
+    "author": "Alex Haley"
+  }
+]
