@@ -4,6 +4,9 @@ mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
 
+// For random quote:
+use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
+
 use axum::{Router, routing::get, response, http::StatusCode, response::Html, response::IntoResponse};
 use tokio::net::TcpListener;
 use askama::Template;
@@ -17,7 +20,12 @@ async fn get_quote() -> impl IntoResponse {
         ).into_response(),
     };
 
-    let quote = match quotes.first() {
+    // Generate a random number:
+    let mut rng = rand::rng();
+    let random_index: usize = rng.random_range(1..=100);
+
+    //let quote = match quotes.first() {
+    let quote = match quotes.iter().nth(random_index) {
         Some(q) => q.to_quote(),
         None => return (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -39,8 +47,10 @@ async fn get_quote() -> impl IntoResponse {
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     // Set up the address:
     let localhost = "127.0.0.1";
+    //let everyone = "0.0.0.0";
     let port = "8000";
     let address = format!("{}:{}", localhost, port);
+    //let address = format!("{}:{}", everyone, port);
 
 
     // Set up the server:
@@ -50,7 +60,8 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .route("/", get(get_quote))
         .nest_service("/static", ServeDir::new("static"));
 
-    println!("Server running at http://{}:{}", localhost, port);
+    //println!("Server running at http://{}:{}", localhost, port);
+    //println!("Server running at http://{}:{}", everyone, port);
 
     axum::serve(listener, app).await?;
 
