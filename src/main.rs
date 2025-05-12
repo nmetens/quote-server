@@ -7,7 +7,7 @@ use tower_http::services::ServeDir;
 // For random quote:
 use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
 
-use axum::{Router, routing::get, response, http::StatusCode, response::Html, response::IntoResponse};
+use axum::{Router, routing::get, http::StatusCode, response::Html, response::IntoResponse};
 use tokio::net::TcpListener;
 use askama::Template;
 
@@ -25,13 +25,16 @@ async fn get_quote() -> impl IntoResponse {
     let random_index: usize = rng.random_range(1..=100);
 
     //let quote = match quotes.first() {
-    let quote = match quotes.iter().nth(random_index) {
+    let quote = match quotes.get(random_index) {
         Some(q) => q.to_quote(),
         None => return (
             StatusCode::INTERNAL_SERVER_ERROR,
             "No quotes found".to_string(),
         ).into_response(),
     };
+
+    //println!("{:?}", quote); // Quote Logging
+    println!("Quote #{}: {} -{}", quote.id, quote.quote, quote.author); // Quote Logging
 
     let rendered = match IndexTemplate::quote(&quote).render() {
         Ok(html) => html,
@@ -47,10 +50,8 @@ async fn get_quote() -> impl IntoResponse {
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     // Set up the address:
     let localhost = "127.0.0.1";
-    //let everyone = "0.0.0.0";
     let port = "8000";
     let address = format!("{}:{}", localhost, port);
-    //let address = format!("{}:{}", everyone, port);
 
 
     // Set up the server:
@@ -60,8 +61,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .route("/", get(get_quote))
         .nest_service("/static", ServeDir::new("static"));
 
-    //println!("Server running at http://{}:{}", localhost, port);
-    //println!("Server running at http://{}:{}", everyone, port);
+    println!("Server running at http://{}:{}", localhost, port);
 
     axum::serve(listener, app).await?;
 

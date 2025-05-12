@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-use std::ops::Deref;
 use std::path::Path;
 use serde::Deserialize;
 
@@ -8,9 +6,9 @@ pub struct JsonQuote {
     id: i32,
     quote: String,
     author: String,
-    tags: Option<Vec<HashSet<String>>>,
 }
 
+#[derive(Debug)]
 pub struct Quote {
     pub id: i32,
     pub quote: String,
@@ -27,11 +25,10 @@ pub fn read_quotes<P: AsRef<Path>>(quotes_path: P) ->
 
 impl JsonQuote {
     pub fn to_quote(&self) -> Quote {
-        let quote = Quote {
-            id: self.id.clone(),
+        Quote {
+            id: self.id,
             quote: self.quote.clone(),
             author: self.author.clone(),
-        };
-        quote
+        }
     }
 }
