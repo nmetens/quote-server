@@ -12,3 +12,8 @@ tokio-postgres = "0.7"
 askama = "0.12"
 tower-http = { version = "0.6", features = ["fs"] }
 rand = "0.9.1"
+postgres = "0.19.10"
+
+[dependencies.sqlx]
+version = "0.8.5"
+features = ["runtime-tokio", "sqlite", "derive", "macros", "migrate", "chrono", "json"]
