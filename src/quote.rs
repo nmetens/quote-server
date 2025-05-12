@@ -8,7 +8,7 @@ pub struct JsonQuote {
     author: String,
 }
 
-#[derive(Debug)]
+//#[derive(Debug)]
 pub struct Quote {
     pub id: i32,
     pub quote: String,
