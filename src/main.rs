@@ -4,8 +4,14 @@ mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
 
+use tokio_postgres::Client;
+use std::sync::Arc;
+
+use tokio_postgres::NoTls;
+
 // For random quote:
 use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
+use std::env; // For environment variable password to connect to the database.
 
 use axum::{Router, routing::get, http::StatusCode, response::Html, response::IntoResponse};
 use tokio::net::TcpListener;
@@ -58,7 +64,8 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(get_quote))
-        .nest_service("/static", ServeDir::new("static"));
+        .nest_service("/static", ServeDir::new("static"))
+        .with_state(shared_client);
 
     println!("Server running at http://{}:{}", localhost, port);
 
