@@ -3,6 +3,9 @@ use quote::*;
 mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
+use sqlx::sqlite::SqlitePoolOptions;
+
+use std::fs;
 
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
 use postgres::{Client, NoTls};
@@ -57,47 +60,43 @@ async fn get_quote() -> impl IntoResponse {
     Html(rendered).into_response()
 }
 
-async fn db_connection() -> Cow<'static, str> {
-    match env::var("DATABASE_URL") {
-        Ok(url) => Cow::Owned(url), // Take ownership of the String
-        Err(_) => Cow::Borrowed("no_url"), // Borrow static string
-    }
-}
-
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     // Set up the address:
     let localhost = "127.0.0.1";
     let port = "8000";
     let address = format!("{}:{}", localhost, port);
 
-    let data_base_url: Cow<str> = db_connection().await;
+    // Connect to the SQLite database: https://docs.rs/sqlx/latest/sqlx/pool/struct.PoolOptions.html
+    let pool = SqlitePoolOptions::new()
+        .connect("sqlite:quotes.db")
+        .await?;
 
-    // Async database connection
-    let (db_client, connection) = tokio_postgres::connect(&data_base_url, NoTls).await?;
+    // Read JSON file
+    let file_content = fs::read_to_string("static/famous_quotes.json")?;
+    // Get the quotes from the json file and put each quote in the vector:
+    let quotes: Vec<Quote> = serde_json::from_str(&file_content)?;
 
-    // Spawn the connection object to run in the background
-    tokio::spawn(async move {
-        if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e);
-        }
-    });
+    // Loop through the vector, putting all the quotes in the database: https://docs.rs/sqlx/latest/sqlx/fn.query.html
+    /*for quote in quotes {
+        sqlx::query("insert into quotes (id, quote, author) values (?, ?, ?);")
+        .bind(&quote.id)
+        .bind(&quote.quote)
+        .bind(&quote.author)
+        .execute(&pool)
+        .await?;
+    }*/
 
-    // Async query execution
-    let rows = db_client.query("SELECT * FROM quote.quotes", &[]).await?;
+    let all_quotes = sqlx::query("select * from quotes;")
+        .fetch_all(&pool).await?;
 
-    // Process rows
-    for row in rows {
-        println!("{:?}", row);
+    for row in all_quotes {
+        // Cargo: error[E0283]: type annotations needed 
+        let id: i64 = row.get("id");
+        let quote: &str = row.get("quote");
+        let author: &str = row.get("author");
+
+        println!("Quote #{}: {} -{}", id, quote, author);
     }
-
-    // source: https://docs.rs/postgres/latest/postgres/struct.Client.html#method.connect
-    //let mut db_client = Client::connect(&data_base_url, NoTls)?;
-    /*let mut select_quotes = db_client.execute(
-        "select * from quote.quotes;",
-        &[],
-    )?;*/
-
-    //println!("{}", select_quotes);
 
     // Set up the server:
     let listener = TcpListener::bind(address).await?;
