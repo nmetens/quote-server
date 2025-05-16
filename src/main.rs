@@ -4,9 +4,11 @@ mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
 use sqlx::sqlite::SqlitePoolOptions;
+use sqlx::types::JsonValue::String;
 
 use std::fs;
 
+use sqlx::Pool;
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
 use postgres::{Client, NoTls};
 use std::borrow::Cow;
@@ -60,6 +62,42 @@ async fn get_quote() -> impl IntoResponse {
     Html(rendered).into_response()
 }
 
+async fn json_to_db(pool: Pool<sqlx::Sqlite>) {
+    // Read JSON file
+    let file_content = fs::read_to_string("static/famous_quotes.json").expect("No json file.");
+    // Get the quotes from the json file and put each quote in the vector:
+    let quotes: Vec<Quote> = serde_json::from_str(&file_content).expect("No json file.");
+
+    // Loop through the vector, putting all the quotes in the database
+    // source: https://docs.rs/sqlx/latest/sqlx/fn.query.html
+    for quote in quotes {
+        let _ = sqlx::query("insert into quotes (id, quote, author) values (?, ?, ?);")
+        .bind(&quote.id)
+        .bind(&quote.quote)
+        .bind(&quote.author)
+        .execute(&pool)
+        .await;
+    }
+}
+
+async fn get_quotes(pool: Pool<sqlx::Sqlite>) -> Result<Vec<Quote>, sqlx::Error> {
+    let rows = sqlx::query("SELECT * FROM quotes;")
+        .fetch_all(&pool)
+        .await?;
+
+    let mut quotes: Vec<Quote> = Vec::new();
+
+    for row in rows {
+        let quote = Quote {
+            id: row.get("id"),
+            quote: row.get("quote"),
+            author: row.get("author"),
+        };
+        quotes.push(quote);
+    }
+    Ok(quotes)
+}
+
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     // Set up the address:
     let localhost = "127.0.0.1";
@@ -67,39 +105,22 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     let address = format!("{}:{}", localhost, port);
 
     // Connect to the SQLite database: https://docs.rs/sqlx/latest/sqlx/pool/struct.PoolOptions.html
-    let pool = SqlitePoolOptions::new()
+    let pool: Pool<sqlx::Sqlite> = SqlitePoolOptions::new()
         .connect("sqlite:quotes.db")
         .await?;
 
-    // Read JSON file
-    let file_content = fs::read_to_string("static/famous_quotes.json")?;
-    // Get the quotes from the json file and put each quote in the vector:
-    let quotes: Vec<Quote> = serde_json::from_str(&file_content)?;
+        // Set up the server:
+    let listener = TcpListener::bind(address).await?;
 
-    // Loop through the vector, putting all the quotes in the database: https://docs.rs/sqlx/latest/sqlx/fn.query.html
-    /*for quote in quotes {
-        sqlx::query("insert into quotes (id, quote, author) values (?, ?, ?);")
-        .bind(&quote.id)
-        .bind(&quote.quote)
-        .bind(&quote.author)
-        .execute(&pool)
-        .await?;
+    /*match get_quotes(pool).await {
+        Ok(quotes) => println!("{:?}", quotes),
+        Err(e) => eprintln!("Error fetching quotes: {}", e),
     }*/
 
-    let all_quotes = sqlx::query("select * from quotes;")
-        .fetch_all(&pool).await?;
-
-    for row in all_quotes {
-        // Cargo: error[E0283]: type annotations needed 
-        let id: i64 = row.get("id");
-        let quote: &str = row.get("quote");
-        let author: &str = row.get("author");
-
-        println!("Quote #{}: {} -{}", id, quote, author);
-    }
-
-    // Set up the server:
-    let listener = TcpListener::bind(address).await?;
+    /*let apis = axum::Router::new()
+        .route("/joke/{joke_id}", routing::get(api::get_joke))
+        .route("/tagged-joke", routing::get(api::get_tagged_joke))
+        .route("/random-joke", routing::get(api::get_random_joke));*/
 
     let app = Router::new()
         .route("/", get(get_quote))
