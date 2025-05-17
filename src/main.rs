@@ -1,4 +1,7 @@
 mod quote;
+mod api;
+
+use api::*;
 use quote::*;
 mod templates;
 use templates::*;
@@ -17,7 +20,7 @@ use std::borrow::Cow;
 use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
 use std::env; // For environment variable password to connect to the database.
 
-use axum::{Router, routing::get, http::StatusCode, response::Html, response::IntoResponse};
+use axum::{Router, routing, http::StatusCode, response::Html, response::IntoResponse};
 use tokio::net::TcpListener;
 use askama::Template;
 
@@ -112,15 +115,9 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         // Set up the server:
     let listener = TcpListener::bind(address).await?;
 
-    /*match get_quotes(pool).await {
-        Ok(quotes) => println!("{:?}", quotes),
-        Err(e) => eprintln!("Error fetching quotes: {}", e),
-    }*/
-
     /*let apis = axum::Router::new()
-        .route("/joke/{joke_id}", routing::get(api::get_joke))
-        .route("/tagged-joke", routing::get(api::get_tagged_joke))
-        .route("/random-joke", routing::get(api::get_random_joke));*/
+        .route("/quote/{joke_id}", routing::get(api::get_quote_by_id))
+        .route("/random-quote", routing::get(api::get_random_quote));*/
 
     let app = Router::new()
         .route("/", get(get_quote))
