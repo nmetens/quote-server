@@ -10,6 +10,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::types::JsonValue::String;
 
 use std::fs;
+use std::string::String as string;
 
 use sqlx::Pool;
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
@@ -29,7 +30,33 @@ struct AppState {
     current_quote: Quote,
 }
 
+const starting_quote: Quote = Quote {
+    id: 101,
+    quote: "Yesterday is history, tomorrow is a mystery, but today is a gift. That's why it's called the present".to_string(),
+    author: "-Oogway".to_string(),
+};
+
+async fn rand_quote() -> (usize, Quote) {
+    let quotes = match read_quotes("static/famous_quotes.json") {
+        Ok(quotes) => quotes,
+        _ => return (111, starting_quote),
+    };
+
+    // Generate a random number:
+    let mut rng = rand::rng();
+    let random_index: usize = rng.random_range(1..=100);
+
+    //let quote = match quotes.first() {
+    let quote = match quotes.get(random_index) {
+        Some(q) => q.to_quote(),
+        None => return (111, starting_quote),
+    };
+
+    (random_index, quote)
+}
+
 async fn get_quote() -> impl IntoResponse {
+    
     let quotes = match read_quotes("static/famous_quotes.json") {
         Ok(quotes) => quotes,
         Err(err) => return (
@@ -112,6 +139,14 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .connect("sqlite:quotes.db")
         .await?;
 
+    /*let current_quote = Quote {
+        id: ,
+        quote: rand_quote(),
+         
+    };*/
+
+    //let state = AppState { pool, };
+
         // Set up the server:
     let listener = TcpListener::bind(address).await?;
 
@@ -120,8 +155,9 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .route("/random-quote", routing::get(api::get_random_quote));*/
 
     let app = Router::new()
-        .route("/", get(get_quote))
+        //.route("/", get(get_quote))
         .nest_service("/static", ServeDir::new("static"));
+        //.with_state(
 
     println!("Server running at http://{}:{}", localhost, port);
 

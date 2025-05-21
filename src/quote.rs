@@ -1,6 +1,7 @@
 use std::path::Path;
 use serde::Deserialize;
 use sqlx::SqlitePool;
+use sqlx::Row;
 
 #[derive(Deserialize)]
 pub struct JsonQuote {
@@ -9,7 +10,7 @@ pub struct JsonQuote {
     author: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, sqlx::FromRow)]
 pub struct Quote {
     pub id: i32,
     pub quote: String,
@@ -41,7 +42,7 @@ impl JsonQuote {
 }
 
 pub async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<Quote, sqlx::Error> {
-    let quote = sqlx::query("SELECT * FROM quotes WHERE id = ?;")
+    let quote = sqlx::query_as::<_, Quote>("SELECT * FROM quotes WHERE id = ?;")
         .bind(&quote_id)
         .fetch_one(db)
         .await?;
