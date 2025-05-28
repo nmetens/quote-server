@@ -7,19 +7,24 @@ mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
 use sqlx::sqlite::SqlitePoolOptions;
-use sqlx::types::JsonValue::String;
+use utoipa::{OpenApi, ToSchema};
+
+use clap::Parser;
+use serde::{Serialize, Deserialize};
+use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
+use tokio::{net, sync::RwLock};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use utoipa_axum::{router::OpenApiRouter, routes};
+use utoipa_rapidoc::RapiDoc;
+use utoipa_redoc::{Redoc, Servable};
+use utoipa_swagger_ui::SwaggerUi;
 
 use std::fs;
-use std::string::String as string;
 
 use sqlx::Pool;
-use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
-use postgres::{Client, NoTls};
-use std::borrow::Cow;
 
 // For random quote:
 use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
-use std::env; // For environment variable password to connect to the database.
 
 use axum::routing::get;
 use axum::{Router, routing, http::StatusCode, response::Html, response::IntoResponse};
@@ -80,7 +85,6 @@ async fn get_quote() -> impl IntoResponse {
         ).into_response(),
     };
 
-    //println!("{:?}", quote); // Quote Logging
     println!("Quote #{}: {} -{}", quote.id, quote.quote, quote.author); // Quote Logging
 
     let rendered = match IndexTemplate::quote(&quote).render() {
@@ -141,20 +145,8 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .connect("sqlite:quotes.db")
         .await?;
 
-    /*let current_quote = Quote {
-        id: ,
-        quote: rand_quote(),
-         
-    };*/
-
-    //let state = AppState { pool, };
-
-        // Set up the server:
+    // Set up the server:
     let listener = TcpListener::bind(address).await?;
-
-    /*let apis = axum::Router::new()
-        .route("/quote/{joke_id}", routing::get(api::get_quote_by_id))
-        .route("/random-quote", routing::get(api::get_random_quote));*/
 
     let starting_quote: Quote = Quote {
         id: 101,
@@ -162,10 +154,13 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         author: "-Oogway".to_string(),
     };
 
+    let (api_router, api) = OpenApiRouter::with_openapi(api::ApiDoc::openapi())
+        .nest("/api/v1", api::router())
+        .split_for_parts();
+
     let app = Router::new()
         .route("/", get(get_quote))
         .nest_service("/static", ServeDir::new("static"));
-        //.with_state(
 
     println!("Server running at http://{}:{}", localhost, port);
 
