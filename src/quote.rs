@@ -51,11 +51,11 @@ impl JsonQuote {
         (StatusCode::OK, axum::Json(self)).into_response()
     }
 }*/
-impl IntoResponse for &JsonQuote {
+/*impl IntoResponse for &JsonQuote {
     fn into_response(self) -> axum::response::Response {
         (StatusCode::OK, Json(self)).into_response()
     }
-}
+}*/
 
 pub async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<Quote, sqlx::Error> {
     let quote = sqlx::query_as::<_, Quote>("SELECT * FROM quotes WHERE id = ?;")

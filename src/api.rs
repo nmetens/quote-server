@@ -6,7 +6,7 @@ use axum::Json;
 use crate::quote;
 use crate::JsonQuote;
 
-pub async fn get_quote(db: &SqlitePool, quote_id: &str) -> Result<Response, StatusCode> {
+/*pub async fn get_quote(db: &SqlitePool, quote_id: &str) -> Result<Response, StatusCode> {
     let quote_result = quote::get_quote_by_id(db, quote_id).await;
 
     match quote_result {
@@ -19,7 +19,7 @@ pub async fn get_quote(db: &SqlitePool, quote_id: &str) -> Result<Response, Stat
             Err(StatusCode::NOT_FOUND)
         }
     }
-}
+}*/
 /*
 pub async fn get_quote(db: &SqlitePool, quote_id: &str) -> Result<response::Response, StatusCode> {
     let quote_result = quote::get_quote_by_id(db, quote_id).await;

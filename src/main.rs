@@ -21,6 +21,7 @@ use std::borrow::Cow;
 use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
 use std::env; // For environment variable password to connect to the database.
 
+use axum::routing::get;
 use axum::{Router, routing, http::StatusCode, response::Html, response::IntoResponse};
 use tokio::net::TcpListener;
 use askama::Template;
@@ -29,7 +30,6 @@ struct AppState {
     db: SqlitePool,
     current_quote: Quote,
 }
-
 
 async fn rand_quote() -> (usize, Quote) {
 
@@ -163,7 +163,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     let app = Router::new()
-        //.route("/", get(get_quote))
+        .route("/", get(get_quote))
         .nest_service("/static", ServeDir::new("static"));
         //.with_state(
 
