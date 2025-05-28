@@ -1,13 +1,16 @@
 mod quote;
+mod error;
 mod api;
 
 use api::*;
 use quote::*;
+use error::*;
 mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
 use sqlx::sqlite::SqlitePoolOptions;
 use utoipa::{OpenApi, ToSchema};
+use std::sync::Arc;
 
 use clap::Parser;
 use serde::{Serialize, Deserialize};
@@ -22,6 +25,7 @@ use utoipa_swagger_ui::SwaggerUi;
 use std::fs;
 
 use sqlx::Pool;
+use std::borrow::Cow;
 
 // For random quote:
 use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
@@ -31,13 +35,45 @@ use axum::{Router, routing, http::StatusCode, response::Html, response::IntoResp
 use tokio::net::TcpListener;
 use askama::Template;
 
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, name = "init-from")]
+    init_from: Option<std::path::PathBuf>,
+    #[arg(short, long, name = "db-uri")]
+    db_uri: Option<String>,
+}
+
 struct AppState {
     db: SqlitePool,
     current_quote: Quote,
 }
 
-async fn rand_quote() -> (usize, Quote) {
+fn get_db_uri(db_uri: Option<&str>) -> Cow<str> {
+    if let Some(db_uri) = db_uri {
+        db_uri.into()
+    } else if let Ok(db_uri) = std::env::var("DATABASE_URL") {
+        db_uri.into()
+    } else {
+        "sqlite://db/quotes.db".into()
+    }
+}
+fn extract_db_dir(db_uri: &str) -> Result<&str, QuoteError> {
+    if db_uri.starts_with("sqlite://") && db_uri.ends_with(".db") {
+        let start = db_uri.find(':').unwrap() + 3;
+        let mut path = &db_uri[start..];
+        if let Some(end) = path.rfind('/') {
+            path = &path[..end];
+        } else {
+            path = "";
+        }
+        Ok(path)
+    } else {
+        Err(QuoteError::InvalidDbUri(db_uri.to_string()))
+    }
+}
 
+/*
+async fn rand_quote() -> (usize, Quote) {
     let starting_quote: Quote = Quote {
         id: 101,
         quote: "Yesterday is history, tomorrow is a mystery, but today is a gift. That's why it's called the present".to_string(),
@@ -61,8 +97,8 @@ async fn rand_quote() -> (usize, Quote) {
 
     (random_index, quote)
 }
-
-async fn get_quote() -> impl IntoResponse {
+*/
+/*async fn get_quote() -> impl IntoResponse {
     
     let quotes = match read_quotes("static/famous_quotes.json") {
         Ok(quotes) => quotes,
@@ -97,8 +133,8 @@ async fn get_quote() -> impl IntoResponse {
 
     Html(rendered).into_response()
 }
-
-async fn json_to_db(pool: Pool<sqlx::Sqlite>) {
+*/
+/*async fn json_to_db(pool: Pool<sqlx::Sqlite>) {
     // Read JSON file
     let file_content = fs::read_to_string("static/famous_quotes.json").expect("No json file.");
     // Get the quotes from the json file and put each quote in the vector:
@@ -115,8 +151,8 @@ async fn json_to_db(pool: Pool<sqlx::Sqlite>) {
         .await;
     }
 }
-
-async fn get_quotes(pool: Pool<sqlx::Sqlite>) -> Result<Vec<Quote>, sqlx::Error> {
+*/
+/*async fn get_quotes(pool: Pool<sqlx::Sqlite>) -> Result<Vec<Quote>, sqlx::Error> {
     let rows = sqlx::query("SELECT * FROM quotes;")
         .fetch_all(&pool)
         .await?;
@@ -132,9 +168,55 @@ async fn get_quotes(pool: Pool<sqlx::Sqlite>) -> Result<Vec<Quote>, sqlx::Error>
         quotes.push(quote);
     }
     Ok(quotes)
-}
+}*/
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+
+    let db_uri: Cow<'_, str> = get_db_uri(args.db_uri.as_deref());
+    if !sqlite::Sqlite::database_exists(&db_uri).await? {
+        let db_dir = extract_db_dir(&db_uri)?;
+        std::fs::create_dir_all(db_dir)?;
+        sqlite::Sqlite::create_database(&db_uri).await?
+    }
+    let db = SqlitePool::connect(&db_uri).await?;
+    sqlx::migrate!().run(&db).await?;
+    if let Some(path) = args.init_from {
+        let jokes = read_quotes(path)?;
+        'next_joke: for jj in jokes {
+            let mut jtx = db.begin().await?;
+            let (j, ts) = jj.to_quote();
+            let joke_insert = sqlx::query!(
+                "INSERT INTO jokes (id, whos_there, answer_who, joke_source) VALUES ($1, $2, $3, $4);",
+                j.id,
+                j.whos_there,
+                j.answer_who,
+                j.joke_source,
+            )
+            .execute(&mut *jtx)
+            .await;
+            if let Err(e) = joke_insert {
+                eprintln!("error: joke insert: {}: {}", j.id, e);
+                jtx.rollback().await?;
+                continue;
+            };
+            for t in ts {
+                let tag_insert =
+                    sqlx::query!("INSERT INTO tags (joke_id, tag) VALUES ($1, $2);", j.id, t,)
+                        .execute(&mut *jtx)
+                        .await;
+                if let Err(e) = tag_insert {
+                    eprintln!("error: tag insert: {} {}: {}", j.id, t, e);
+                    jtx.rollback().await?;
+                    continue 'next_joke;
+                };
+            }
+            jtx.commit().await?;
+        }
+        return Ok(());
+    }
+
+
     // Set up the address:
     let localhost = "127.0.0.1";
     let port = "8000";
