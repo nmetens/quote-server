@@ -30,13 +30,15 @@ struct AppState {
     current_quote: Quote,
 }
 
-const starting_quote: Quote = Quote {
-    id: 101,
-    quote: "Yesterday is history, tomorrow is a mystery, but today is a gift. That's why it's called the present".to_string(),
-    author: "-Oogway".to_string(),
-};
 
 async fn rand_quote() -> (usize, Quote) {
+
+    let starting_quote: Quote = Quote {
+        id: 101,
+        quote: "Yesterday is history, tomorrow is a mystery, but today is a gift. That's why it's called the present".to_string(),
+        author: "-Oogway".to_string(),
+    };
+
     let quotes = match read_quotes("static/famous_quotes.json") {
         Ok(quotes) => quotes,
         _ => return (111, starting_quote),
@@ -153,6 +155,12 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     /*let apis = axum::Router::new()
         .route("/quote/{joke_id}", routing::get(api::get_quote_by_id))
         .route("/random-quote", routing::get(api::get_random_quote));*/
+
+    let starting_quote: Quote = Quote {
+        id: 101,
+        quote: "Yesterday is history, tomorrow is a mystery, but today is a gift. That's why it's called the present".to_string(),
+        author: "-Oogway".to_string(),
+    };
 
     let app = Router::new()
         //.route("/", get(get_quote))

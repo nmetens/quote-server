@@ -2,6 +2,11 @@ use std::path::Path;
 use serde::Deserialize;
 use sqlx::SqlitePool;
 use sqlx::Row;
+use axum::Json;
+
+use axum::response::IntoResponse;
+use axum::http::StatusCode;
+
 
 #[derive(Deserialize)]
 pub struct JsonQuote {
@@ -36,8 +41,19 @@ impl JsonQuote {
 }
 
 impl JsonQuote {
-    pub fn new(quote: String, author: String) -> Self {
-        JsonQuote { quote, author }
+    pub fn new(id: i32, quote: String, author: String) -> Self {
+        JsonQuote { id, quote, author }
+    }
+}
+
+/*impl axum::response::IntoResponse for &JsonQuote {
+    fn into_response(self) -> axum::response::Response {
+        (StatusCode::OK, axum::Json(self)).into_response()
+    }
+}*/
+impl IntoResponse for &JsonQuote {
+    fn into_response(self) -> axum::response::Response {
+        (StatusCode::OK, Json(self)).into_response()
     }
 }
 
