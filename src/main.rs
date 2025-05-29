@@ -184,19 +184,18 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:?}", db);
     println!("Resolved DB URI: {}", db_uri);
-    /*if let Some(path) = args.init_from {
+    if let Some(path) = args.init_from {
         let quotes = read_quotes(path)?;
         'next_quote: for qu in quotes {
             let mut qtx = db.begin().await?;
             let (q, ts) = qu.to_quote();
             let quote_insert = sqlx::query(
-                "insert into quotes (id, quote, author) values($1, $2, $3);",
-                q.id,
-                q.quote,
-                q.author,
-            )
-            .execute(&mut *qtx)
-            .await;
+                "insert into quotes (id, quote, author) values($1, $2, $3);")
+                .bind(q.id)
+                .bind(q.quote)
+                .bind(q.author)
+                .execute(&mut *qtx)
+                .await;
             if let Err(e) = quote_insert {
                 eprintln!("error: quote insert: {}: {}", q.id, e);
                 qtx.rollback().await?;
@@ -204,7 +203,9 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
             };
             for t in ts {
                 let tag_insert =
-                    sqlx::query!("insert into tags (quote_id, tag) values ($1, $2);", q.id, t,)
+                    sqlx::query("insert into tags (quote_id, tag) values ($1, $2);")
+                        .bind(q.id)
+                        .bind(t)
                         .execute(&mut *qtx)
                         .await;
                 if let Err(e) = tag_insert {
@@ -217,6 +218,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         }
         return Ok(());
     }
+    /*
     let current_quote = Quote {
         id: 101,
         quote: "Mojo".to_string(),
