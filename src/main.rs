@@ -180,42 +180,49 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         sqlite::Sqlite::create_database(&db_uri).await?
     }
     let db = SqlitePool::connect(&db_uri).await?;
-    sqlx::migrate!().run(&db).await?;
-    if let Some(path) = args.init_from {
-        let jokes = read_quotes(path)?;
-        'next_joke: for jj in jokes {
-            let mut jtx = db.begin().await?;
-            let (j, ts) = jj.to_quote();
-            let joke_insert = sqlx::query!(
-                "INSERT INTO jokes (id, whos_there, answer_who, joke_source) VALUES ($1, $2, $3, $4);",
-                j.id,
-                j.whos_there,
-                j.answer_who,
-                j.joke_source,
+    //sqlx::migrate!().run(&db).await?;
+
+    println!("{:?}", db);
+    /*if let Some(path) = args.init_from {
+        let quotes = read_quotes(path)?;
+        'next_quote: for qu in quotes {
+            let mut qtx = db.begin().await?;
+            let (q, ts) = qu.to_quote();
+            let quote_insert = sqlx::query(
+                "insert into quotes (id, quote, author) values($1, $2, $3);",
+                q.id,
+                q.quote,
+                q.author,
             )
-            .execute(&mut *jtx)
+            .execute(&mut *qtx)
             .await;
-            if let Err(e) = joke_insert {
-                eprintln!("error: joke insert: {}: {}", j.id, e);
-                jtx.rollback().await?;
+            if let Err(e) = quote_insert {
+                eprintln!("error: quote insert: {}: {}", q.id, e);
+                qtx.rollback().await?;
                 continue;
             };
             for t in ts {
                 let tag_insert =
-                    sqlx::query!("INSERT INTO tags (joke_id, tag) VALUES ($1, $2);", j.id, t,)
-                        .execute(&mut *jtx)
+                    sqlx::query!("insert into tags (quote_id, tag) values ($1, $2);", q.id, t,)
+                        .execute(&mut *qtx)
                         .await;
                 if let Err(e) = tag_insert {
-                    eprintln!("error: tag insert: {} {}: {}", j.id, t, e);
-                    jtx.rollback().await?;
-                    continue 'next_joke;
+                    eprintln!("error: tag insert: {} {}: {}", q.id, t, e);
+                    qtx.rollback().await?;
+                    continue 'next_quote;
                 };
             }
-            jtx.commit().await?;
+            qtx.commit().await?;
         }
         return Ok(());
     }
-
+    let current_quote = Quote {
+        id: 101,
+        quote: "Mojo".to_string(),
+        author: "Mo' jokes, please.".to_string(),
+    };
+    let app_state = AppState { db, current_quote};
+    let state = Arc::new(RwLock::new(app_state));
 
     // Set up the address:
     let localhost = "127.0.0.1";
@@ -246,7 +253,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Server running at http://{}:{}", localhost, port);
 
-    axum::serve(listener, app).await?;
+    axum::serve(listener, app).await?;*/
 
     Ok(())
 }

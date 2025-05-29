@@ -70,3 +70,7 @@ features = ["axum"]
 git = "https://github.com/juhaku/utoipa.git"
 rev = "cecda0531bf7d90800af66b186055932ee730526"
 features = ["axum"]
+
+[[example]]
+name = "db_conn"
+path = "examples/db/conn.rs"

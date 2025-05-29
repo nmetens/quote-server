@@ -7,7 +7,7 @@ use crate::*;
     )
 )]
 pub struct ApiDoc;
-
+/* 
 pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
     OpenApiRouter::new()
         .routes(routes!(get_quote))
@@ -93,4 +93,4 @@ pub async fn get_random_quote(
             Err(http::StatusCode::NOT_FOUND)
         }
     }
-}
+}*/
