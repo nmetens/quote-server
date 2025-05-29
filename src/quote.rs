@@ -57,8 +57,21 @@ impl axum::response::IntoResponse for &JsonQuote {
         (StatusCode::OK, axum::Json(&self)).into_response()
     }
 }
-/* 
-pub async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<(Joke, Vec<String>), sqlx::Error> {
+pub async fn get(db: &SqlitePool, quote_id: &str) -> Result<(Quote, Vec<String>), sqlx::Error> {
+    let quote = sqlx::query_as("select * from quotes where id = $1;")
+        .bind(quote_id)
+        .fetch_one(db)
+        .await?;
+
+    let tags: Vec<String> = sqlx::query_scalar!("SELECT tag FROM tags WHERE quote_id = $1;", quote_id)
+        .fetch_all(db)
+        .await?;
+
+    Ok((quote, tags))
+}
+
+/
+pub async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<(quote, Vec<String>), sqlx::Error> {
     let quote = sqlx::query_as!(Quote, "select * from quotes id = $1;", quote_id)
         .fetch_one(db)
         .await?;
@@ -74,4 +87,4 @@ pub async fn get_random(db: &SqlitePool) -> Result<String, sqlx::Error> {
     sqlx::query_scalar!("select id from quotes order by random() limit 1;")
         .fetch_one(db)
         .await
-}*/
+}

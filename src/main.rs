@@ -1,6 +1,7 @@
 mod quote;
 mod error;
 mod api;
+mod web;
 
 use api::*;
 use quote::*;
@@ -8,32 +9,28 @@ use error::*;
 mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
-use sqlx::sqlite::SqlitePoolOptions;
 use utoipa::{OpenApi, ToSchema};
 use std::sync::Arc;
 
+use axum::{
+    self,
+    extract::{Path, Query, State, Json},
+    http,
+    response::{self, IntoResponse},
+    routing,
+};
+
 use clap::Parser;
-use serde::{Serialize, Deserialize};
-use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
-use tokio::{net, sync::RwLock};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use utoipa_axum::{router::OpenApiRouter, routes};
-use utoipa_rapidoc::RapiDoc;
-use utoipa_redoc::{Redoc, Servable};
-use utoipa_swagger_ui::SwaggerUi;
-
-use std::fs;
-
+use serde::{Deserialize};
+use sqlx::{SqlitePool, migrate::MigrateDatabase, sqlite};
+use tokio::{sync::RwLock};
 use sqlx::Pool;
 use std::borrow::Cow;
 
 // For random quote:
-use rand::Rng; // Source: https://rust-random.github.io/book/guide-values.html
-
 use axum::routing::get;
-use axum::{Router, routing, http::StatusCode, response::Html, response::IntoResponse};
+use axum::{Router, http::StatusCode, response::IntoResponse};
 use tokio::net::TcpListener;
-use askama::Template;
 
 #[derive(Parser)]
 struct Args {
@@ -218,11 +215,11 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         }
         return Ok(());
     }
-    /*
+    
     let current_quote = Quote {
         id: 101,
-        quote: "Mojo".to_string(),
-        author: "Mo' jokes, please.".to_string(),
+        quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
+        author: "Turtle".to_string(),
     };
     let app_state = AppState { db, current_quote};
     let state = Arc::new(RwLock::new(app_state));
@@ -232,31 +229,26 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     let port = "8000";
     let address = format!("{}:{}", localhost, port);
 
+    // Set up the server:
+    let listener = TcpListener::bind(address).await?;
+
+    /* 
     // Connect to the SQLite database: https://docs.rs/sqlx/latest/sqlx/pool/struct.PoolOptions.html
     let pool: Pool<sqlx::Sqlite> = SqlitePoolOptions::new()
         .connect("sqlite:quotes.db")
         .await?;
 
-    // Set up the server:
-    let listener = TcpListener::bind(address).await?;
-
-    let starting_quote: Quote = Quote {
-        id: 101,
-        quote: "Yesterday is history, tomorrow is a mystery, but today is a gift. That's why it's called the present".to_string(),
-        author: "-Oogway".to_string(),
-    };
-
     let (api_router, api) = OpenApiRouter::with_openapi(api::ApiDoc::openapi())
         .nest("/api/v1", api::router())
         .split_for_parts();
-
+    */
     let app = Router::new()
-        .route("/", get(get_quote))
+        .route("/", get(web::get_quote))
         .nest_service("/static", ServeDir::new("static"));
 
     println!("Server running at http://{}:{}", localhost, port);
 
-    axum::serve(listener, app).await?;*/
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

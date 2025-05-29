@@ -5,14 +5,16 @@ use askama::Template;
 #[template(path = "index.html")]
 pub struct IndexTemplate<'a> {
     quote: &'a Quote,
-    //stylesheet: &'static str,
+    stylesheet: &'static str,
+    tags: String,
 }
 
 impl<'a> IndexTemplate<'a> {
-    pub fn quote(quote: &'a Quote) -> Self {
+    pub fn quote(quote: &'a Quote, tags: String) -> Self {
         Self {
             quote,
-            //stylesheet: "/quote.css",
+            stylesheet: "/quote.css",
+            tags,
         }
     }
 }
