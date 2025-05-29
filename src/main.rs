@@ -179,10 +179,11 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         std::fs::create_dir_all(db_dir)?;
         sqlite::Sqlite::create_database(&db_uri).await?
     }
-    let db = SqlitePool::connect(&db_uri).await?;
-    //sqlx::migrate!().run(&db).await?;
+    let db: Pool<sqlx::Sqlite> = SqlitePool::connect(&db_uri).await?;
+    sqlx::migrate!().run(&db).await?;
 
     println!("{:?}", db);
+    println!("Resolved DB URI: {}", db_uri);
     /*if let Some(path) = args.init_from {
         let quotes = read_quotes(path)?;
         'next_quote: for qu in quotes {
