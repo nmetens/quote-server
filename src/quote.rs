@@ -16,7 +16,7 @@ pub struct JsonQuote {
     pub author: String,
 }
 
-#[derive(Debug, Deserialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, utoipa::ToSchema)]
 pub struct Quote {
     pub id: i32,
     pub quote: String,

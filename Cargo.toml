@@ -4,16 +4,72 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = "0.8.3"
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
-tokio = { version = "1", features = ["full"] }
-tokio-postgres = "0.7"
-askama = "0.12"
-tower-http = { version = "0.6", features = ["fs"] }
 rand = "0.9.1"
-postgres = "0.19.10"
+askama = "0.14.0"
+axum = "0.8.4"
+fastrand = "2.3.0"
+log = "0.4.27"
+mime = "0.3.17"
+serde_json = "1.0.140"
+thiserror = "2.0.12"
+tracing = "0.1.41"
+dotenv = "0.15"
+
+[dependencies.clap]
+version = "4.5.38"
+features = ["derive"]
+
+[dependencies.serde]
+version = "1.0.219"
+features = ["derive"]
+
+[dependencies.tokio]
+version = "1.45.0"
+features = ["full"]
+
+[dependencies.tower-http]
+version = "0.6.4"
+features = ["fs", "trace", "cors"]
+
+[dependencies.tracing-subscriber]
+version = "0.3.19"
+features = ["env-filter"]
 
 [dependencies.sqlx]
-version = "0.8.5"
+version = "0.8.6"
 features = ["runtime-tokio", "sqlite", "derive", "macros", "migrate", "chrono", "json"]
+
+[dependencies.tokio-stream]
+version = "0.1.17"
+features = ["full"]
+
+[dependencies.utoipa]
+#version = "5.3.1"
+git = "https://github.com/juhaku/utoipa.git"
+rev = "cecda0531bf7d90800af66b186055932ee730526"
+features = ["axum_extras"]
+
+[dependencies.utoipa-axum]
+git = "https://github.com/juhaku/utoipa.git"
+rev = "cecda0531bf7d90800af66b186055932ee730526"
+
+[dependencies.utoipa-rapidoc]
+#version = "6.0.0"
+git = "https://github.com/juhaku/utoipa.git"
+rev = "cecda0531bf7d90800af66b186055932ee730526"
+features = ["axum"]
+
+[dependencies.utoipa-redoc]
+#version = "6.0.0"
+git = "https://github.com/juhaku/utoipa.git"
+rev = "cecda0531bf7d90800af66b186055932ee730526"
+features = ["axum"]
+
+[dependencies.utoipa-swagger-ui]
+git = "https://github.com/juhaku/utoipa.git"
+rev = "cecda0531bf7d90800af66b186055932ee730526"
+features = ["axum"]
+
+[[example]]
+name = "db_conn"
+path = "examples/db/conn.rs"
