@@ -6,13 +6,14 @@ use axum::Json;
 
 use axum::response::IntoResponse;
 use axum::http::StatusCode;
+use serde::Serialize;
 
 
-#[derive(Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct JsonQuote {
-    id: i32,
-    quote: String,
-    author: String,
+    pub id: i32,
+    pub quote: String,
+    pub author: String,
 }
 
 #[derive(Debug, Deserialize, sqlx::FromRow)]

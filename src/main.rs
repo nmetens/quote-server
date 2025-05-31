@@ -141,20 +141,14 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .connect("sqlite:quotes.db")
         .await?;
 
-    /*let current_quote = Quote {
-        id: ,
-        quote: rand_quote(),
-         
-    };*/
-
     //let state = AppState { pool, };
 
-        // Set up the server:
+    // Set up the server:
     let listener = TcpListener::bind(address).await?;
 
-    /*let apis = axum::Router::new()
-        .route("/quote/{joke_id}", routing::get(api::get_quote_by_id))
-        .route("/random-quote", routing::get(api::get_random_quote));*/
+    let apis: Router = Router::new()
+        .route("/quote/{joke_id}", get(api::get_quote_by_id))
+        .route("/random-quote", get(api::get_random_quote));
 
     let starting_quote: Quote = Quote {
         id: 101,
@@ -164,7 +158,9 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(get_quote))
-        .nest_service("/static", ServeDir::new("static"));
+        .route("/{joke_id}", get(api::get_quote_by_id)) // Using the api
+        .nest_service("/static", ServeDir::new("static"))
+        .nest("/api", apis);
         //.with_state(
 
     println!("Server running at http://{}:{}", localhost, port);
