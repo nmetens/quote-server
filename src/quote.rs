@@ -4,9 +4,21 @@ use std::collections::HashSet;
 use std::ops::Deref;
 use std::path::Path;
 
+use axum::response::IntoResponse;
+use axum::http::StatusCode;
+use serde::Serialize;
 use crate::QuoteError;
 
 use serde::{Serialize, Deserialize};
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct JsonQuote {
+    pub id: i32,
+    pub quote: String,
+    pub author: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, utoipa::ToSchema)]
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct JsonQuote {
@@ -17,6 +29,7 @@ pub struct JsonQuote {
 }
 
 #[derive(Clone)]
+
 pub struct Quote {
     pub id: i32,
     pub quote: String,

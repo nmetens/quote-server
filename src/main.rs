@@ -9,6 +9,17 @@ use error::*;
 mod templates;
 use templates::*;
 use tower_http::services::ServeDir;
+
+use sqlx::sqlite::SqlitePoolOptions;
+use sqlx::types::JsonValue::String;
+use sqlx::Sqlite;
+
+use std::fs;
+use std::string::String as string;
+
+use sqlx::Pool;
+use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
+
 use utoipa::{OpenApi, ToSchema};
 use std::sync::Arc;
 
@@ -25,6 +36,7 @@ use serde::{Deserialize};
 use sqlx::{SqlitePool, migrate::MigrateDatabase, sqlite};
 use tokio::{sync::RwLock};
 use sqlx::Pool;
+
 use std::borrow::Cow;
 
 // For random quote:
@@ -40,10 +52,26 @@ struct Args {
     db_uri: Option<String>,
 }
 
+use utoipa::{OpenApi, ToSchema};
+use utoipa_axum::{router::OpenApiRouter, routes};
+use utoipa_rapidoc::RapiDoc;
+use utoipa_redoc::{Redoc, Servable};
+use utoipa_swagger_ui::SwaggerUi;
+
+use clap::Parser;
+extern crate fastrand;
+use serde::{Serialize, Deserialize};
+use tokio::{net, sync::RwLock};
+use tower_http::{services, trace};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+use std::sync::Arc;
+
 struct AppState {
     db: SqlitePool,
     current_quote: Quote,
 }
+
 
 fn get_db_uri(db_uri: Option<&str>) -> Cow<str> {
     if let Some(db_uri) = db_uri {
@@ -237,6 +265,36 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     let pool: Pool<sqlx::Sqlite> = SqlitePoolOptions::new()
         .connect("sqlite:quotes.db")
         .await?;
+
+    //let state = AppState { pool, };
+
+    // Set up the server:
+    let listener = TcpListener::bind(address).await?;
+
+    /*let apis: Router<Pool<Sqlite>> = Router::new()
+        .route("/quote", get(api::get_all_quotes_api))
+        .route("/quote/{quote_id}", get(api::get_quote))
+        //.route("/quote/{quote_id}", get(api::get_quote_by_id))
+        .route("/random-quote", get(api::get_random_quote));*/
+
+    let (api_router, api) = OpenApiRouter::with_openapi(api::ApiDoc::openapi())
+        .nest("/api/v1", api::router())
+        .split_for_parts();
+
+    let swagger_ui = SwaggerUi::new("/swagger-ui")
+        .url("/api-docs/openapi.json", api.clone());
+    let redoc_ui = Redoc::with_url("/redoc", api);
+    let rapidoc_ui = RapiDoc::new("/api-docs/openapi.json").path("/rapidoc");
+
+    let app = Router::new()
+        .route("/", get(get_quote))
+        .nest_service("/static", ServeDir::new("static"))
+        .nest("/api", apis)
+        .merge(swagger_ui)
+        .merge(redoc_ui)
+        .merge(rapidoc_ui)
+        .merge(api_router)
+        .with_state(pool.clone());
 
     let (api_router, api) = OpenApiRouter::with_openapi(api::ApiDoc::openapi())
         .nest("/api/v1", api::router())
