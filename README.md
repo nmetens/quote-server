@@ -22,3 +22,4 @@ were generated using [ChatGPT](https://chatgpt.com/)
 - [Axum Tutorial](https://www.shuttle.dev/blog/2023/12/06/using-axum-rust)
 - [Rust Docs for Axum](https://docs.rs/axum/latest/axum/)
 - Bart Massey's [GitHub](https://github.com/pdx-cs-rust-web/knock-knock)
+- [Examples](https://users.rust-lang.org/t/run-examples-in-subfolders-using-cargo/18154/3) because I needed to test small sections of the program that wasn't working
