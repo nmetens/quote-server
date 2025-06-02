@@ -14,8 +14,8 @@ The methods in this server are asynchronous, so that multiple
 Users can access them simultaneously and view different quotes.
 
 ## Quote Server demonstration so far:
-![A famout Quote](static/quote1.png)
-![A famout Quote](static/quote2.png)
+![A famout Quote](static/quote1.jpg)
+![A famout Quote](static/quote2.jpg)
 
 ## Resources
 - The [random number](https://rust-random.github.io/book/guide-values.html).
