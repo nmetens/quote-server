@@ -1,54 +1,47 @@
-use crate::*;
-
-
-use rand::thread_rng;
-use sqlx::SqlitePool;
-use axum::response::{Response, IntoResponse};
-use axum::http::StatusCode;
-
-use axum::Json;
-use crate::quote;
-use crate::JsonQuote;
-use axum::extract::Path;
-use axum::extract::State;
-
-use crate::*;
+/// This file derives the OpenApi documentation for the ApiDoc struct.
+/// There are three endpoints in this API: 
+///     1) get_quote
+///     2) get_tagged_quote
+///     3) get_random_quote 
+/// It uses utoipa for OpenAPI generation of the Swagger compatible docs.
+/// There is a get_quote_by_id asychrnous method that is used in all api methods.
+/// AppState is shared between enpoints to allow asynchronous visits.
+/// All quotes are fetched using anychronous calls to the database.
 
 #[derive(OpenApi)]
 #[openapi(
     tags(
-        (name = "quote-server", description = "Famous Quote API")
+        (name = "quote-server", description = "Famous Quote API") // Swagger UI grouping.
     )
 )]
-pub struct ApiDoc;
+pub struct ApiDoc; // Struct to create api references.
 
-
+// Function that generates all the api endpoints with OpenApi:
 pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
+
     OpenApiRouter::new()
         .routes(routes!(get_quote))
         .routes(routes!(get_tagged_quote))
         .routes(routes!(get_random_quote))
 }
 
-/* 
-pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
-    OpenApiRouter::new()
-        .routes(routes!(get_quote))
-        .routes(routes!(get_tagged_quote))
-        .routes(routes!(get_random_quote))
-}
-
+// Method that queries the database looking for the quote_id that is passed in as an argument.
 async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<response::Response, http::StatusCode> {
-    let quote_result = quote::get(db, quote_id).await;
+
+    let quote_result = quote::get(db, quote_id).await; // The resulting quote to return.
+
     match quote_result {
-        Ok((quote, tags)) => Ok(JsonQuote::new(quote, tags).into_response()),
-        Err(e) => {
+        Ok((quote, tags)) => Ok(JsonQuote::new(quote, tags).into_response()), // Wrap the quote and tags in JsonQuote struct.
+
+        Err(e) => { // Quote was not found by the id provided. 404 not found displayed.
             log::warn!("quote fetch failed: {}", e);
             Err(http::StatusCode::NOT_FOUND)
         }
     }
 }
 
+// Route created: /quote/{quote_id}
+// Go to the database, extract the correct quote by the id provided. Return error 404 if id not found.
 #[utoipa::path(
     get,
     path = "/quote/{quote_id}",
@@ -58,14 +51,19 @@ async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<response::Re
     )
 )]
 pub async fn get_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>,
-    Path(quote_id): Path<String>,
+    State(app_state): State<Arc<RwLock<AppState>>>, // Grab the app_state.
+    Path(quote_id): Path<String>, // Grab the quote id from the url.
 ) -> Result<response::Response, http::StatusCode> {
-    let app_reader = app_state.read().await;
-    let db = &app_reader.db;
-    get_quote_by_id(db, &quote_id).await
+
+    let app_reader = app_state.read().await; // Extract the app state.
+
+    let db = &app_reader.db; // Grab the common database that is shared amoungst resources.
+
+    get_quote_by_id(db, &quote_id).await // Call method and pass database and id to extract quote from database.
 }
 
+
+// Route created: /tagged-quote
 #[utoipa::path(
     get,
     path = "/tagged-quote",
@@ -75,28 +73,36 @@ pub async fn get_quote(
     )
 )]
 pub async fn get_tagged_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>,
-    Json(tags): Json<Vec<String>>,
+    State(app_state): State<Arc<RwLock<AppState>>>, // Grab the shared app state.
+    Json(tags): Json<Vec<String>>, // Grab the tags from the json.
 ) -> Result<response::Response, http::StatusCode> {
-    log::info!("get tagged quote: {:?}", tags);
-    let app_reader = app_state.read().await;
+
+    log::info!("get tagged quote: {:?}", tags); // Print the result.
+
+    // As before, get the app state and db:
+    let app_reader = app_state.read().await; 
     let db = &app_reader.db;
+
+    // The resulting quote from the tags by random:
     let quote_result = quote::get_tagged(db, tags.iter().map(String::as_ref)).await;
+
     match quote_result {
-        Ok(Some(quote_id)) => get_quote_by_id(db, &quote_id).await,
+        Ok(Some(quote_id)) => get_quote_by_id(db, &quote_id).await, // Matching quote found and returned.
+
         Ok(None) => {
-            log::warn!("quote tag fetch failed tagging");
+            log::warn!("quote tag fetch failed tagging"); // There was no tag like the one provided in the database.
             Err(http::StatusCode::NOT_FOUND)
         }
+
         Err(e) => {
-            log::warn!("quote tag fetch failed: {}", e);
-        Err(e) => {
-            log::warn!("quote fetch failed: {}", e);
+            log::warn!("quote tag fetch failed: {}", e); // Error occured in db.
             Err(http::StatusCode::NOT_FOUND)
         }
     }
 }
 
+// Route created: /random-quote
+// Grabs a random quote from the database.
 #[utoipa::path(
     get,
     path = "/random-quote",
@@ -106,159 +112,21 @@ pub async fn get_tagged_quote(
     )
 )]
 pub async fn get_random_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>,
+    State(app_state): State<Arc<RwLock<AppState>>>, // Extract the shared app state.
 ) -> Result<response::Response, http::StatusCode> {
+
     let app_reader = app_state.read().await;
-    let db = &app_reader.db;
-    let quote_result = quote::get_random(db).await;
+
+    let db = &app_reader.db; // Grab the database.
+
+    let quote_result = quote::get_random(db).await; // Random quote selected from db.
+
     match quote_result {
-        Ok(quote_id) => get_quote_by_id(db, &quote_id).await,
+        Ok(quote_id) => get_quote_by_id(db, &quote_id).await, // Found the quote.
+
         Err(e) => {
-            log::warn!("get random quote failed: {}", e);
+            log::warn!("get random quote failed: {}", e); // Error occured.
             Err(http::StatusCode::NOT_FOUND)
         }
     }
 }
-
-/* Below code implementation is non-Utopia: */
-/*pub async fn get_all_quotes_api(
-    State(pool): State<SqlitePool>,
-) -> impl IntoResponse {
-    match get_quotes(pool).await {
-        Ok(quotes) => Json(quotes).into_response(),
-        Err(err) => (
-            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Database error: {}", err),
-        ).into_response(),
-    }
-}
-
-pub async fn get_quote_by_id(
-    Path(quote_id): Path<i32>,
-) -> impl IntoResponse {
-    let quotes = match read_quotes("static/famous_quotes.json") {
-        Ok(quotes) => quotes,
-        Err(err) => {
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to read quotes: {}", err),
-            ).into_response();
-        }
-    };
-
-    match quotes.iter().find(|q| q.id == quote_id) {
-        Some(quote) => Json(quote.clone()).into_response(),
-        None => (
-            StatusCode::NOT_FOUND,
-            format!("No quote found with ID {}", quote_id),
-        ).into_response(),
-    }
-}
-
-pub async fn get_random_quote() -> impl IntoResponse {
-    let quotes = match read_quotes("static/famous_quotes.json") {
-        Ok(quotes) => quotes,
-        Err(err) => {
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Failed to read quotes: {}", err),
-            ).into_response();
-        }
-    };
-
-    if quotes.is_empty() {
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "No quotes available".to_string(),
-        ).into_response();
-    }
-
-    let mut rng = thread_rng();
-    let index = rng.gen_range(0..quotes.len());
-    let quote = &quotes[index];
-
-    Json(quote).into_response()
-}
-
-pub async fn get_quote(
-    db: &SqlitePool,
-    quote_id: &str,
-) -> impl IntoResponse {
-    match quote::get_quote_by_id(db, quote_id).await {
-        Ok(quote) => {
-            let json_quote = JsonQuote::new(quote.id, quote.quote, quote.author);
-            (StatusCode::OK, Json(json_quote)).into_response()
-        }
-        Err(e) => {
-            eprintln!("quote fetch failed: {}", e);
-            (StatusCode::NOT_FOUND, "Quote not found").into_response()
-        }
-    }
-}*/
-
-    path = "/quote/{quote_id}",
-    responses(
-        (status = 200, description = "Get a quote by id", body = [JsonQuote]),
-        (status = 404, description = "No matching quote"),
-    )
-)]
-pub async fn get_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>,
-    Path(quote_id): Path<String>,
-) -> Result<response::Response, http::StatusCode> {
-    let app_reader = app_state.read().await;
-    let db = &app_reader.db;
-    get_quote_by_id(db, &quote_id).await
-}
-
-#[utoipa::path(
-    get,
-    path = "/tagged-quote",
-    responses(
-        (status = 200, description = "Get a quote by tags", body = [JsonQuote]),
-        (status = 404, description = "No matching quotes"),
-    )
-)]
-pub async fn get_tagged_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>,
-    Json(tags): Json<Vec<String>>,
-) -> Result<response::Response, http::StatusCode> {
-    log::info!("get tagged quote: {:?}", tags);
-    let app_reader = app_state.read().await;
-    let db = &app_reader.db;
-    let quote_result = quote::get_tagged(db, tags.iter().map(String::as_ref)).await;
-    match quote_result {
-        Ok(Some(quote_id)) => get_quote_by_id(db, &quote_id).await,
-        Ok(None) => {
-            log::warn!("quote tag fetch failed tagging");
-            Err(http::StatusCode::NOT_FOUND)
-        }
-        Err(e) => {
-            log::warn!("quote tag fetch failed: {}", e);
-            Err(http::StatusCode::NOT_FOUND)
-        }
-    }
-}
-
-#[utoipa::path(
-    get,
-    path = "/random-quote",
-    responses(
-        (status = 200, description = "Get a random quote", body = [JsonQuote]),
-        (status = 404, description = "No quote"),
-    )
-)]
-pub async fn get_random_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>,
-) -> Result<response::Response, http::StatusCode> {
-    let app_reader = app_state.read().await;
-    let db = &app_reader.db;
-    let quote_result = quote::get_random(db).await;
-    match quote_result {
-        Ok(quote_id) => get_quote_by_id(db, &quote_id).await,
-        Err(e) => {
-            log::warn!("get random quote failed: {}", e);
-            Err(http::StatusCode::NOT_FOUND)
-        }
-    }
-}*/
