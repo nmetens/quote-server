@@ -1,0 +1,802 @@
+[
+  {
+    "id": "1",
+    "quote": "Marriage is our society's most pro-child institution.",
+    "author": "David Blankenhorn",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "2",
+    "quote": "There is no more lovely, friendly and charming relationship than a good marriage.",
+    "author": "Martin Luther",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "3",
+    "quote": "To love and be loved is to feel the sun from both sides.",
+    "author": "David Viscott",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "4",
+    "quote": "The obstacle on the path becomes the path.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "5",
+    "quote": "It is not that we have a short time to live, but that we waste a lot of it.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "6",
+    "quote": "Life isn\u2019t about finding yourself. Life is about creating yourself.",
+    "author": "George Bernard Shaw",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "7",
+    "quote": "Man conquers the world by conquering himself.",
+    "author": "Zeno of Citium",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "8",
+    "quote": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "9",
+    "quote": "Good friends, good books and a sleepy conscience: this is the ideal life.",
+    "author": "Mark Twain",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "10",
+    "quote": "I love you not because of who you are, but because of who I am when I am with you.",
+    "author": "Roy Croft",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "11",
+    "quote": "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    "author": "Winston Churchill",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "12",
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "13",
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "14",
+    "quote": "Don\u2019t watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "15",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "16",
+    "quote": "You have bewitched me, body and soul, and I love, I love, I love you.",
+    "author": "Jane Austen",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "17",
+    "quote": "I love you not because of who you are, but because of who I am when I am with you.",
+    "author": "Roy Croft",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "18",
+    "quote": "The way to get started is to quit talking and begin doing.",
+    "author": "Walt Disney",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "19",
+    "quote": "The secret to a happy marriage is if you can be at peace with someone within four walls.",
+    "author": "Bruce Forsyth",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "20",
+    "quote": "I saw that you were perfect, and so I loved you.",
+    "author": "Angelita Lim",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "21",
+    "quote": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "22",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "23",
+    "quote": "Marriage is our society's most pro-child institution.",
+    "author": "David Blankenhorn",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "24",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "25",
+    "quote": "I love you more than I have ever found a way to say to you.",
+    "author": "Ben Folds",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "26",
+    "quote": "Don\u2019t watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "27",
+    "quote": "The obstacle on the path becomes the path.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "28",
+    "quote": "The obstacle on the path becomes the path.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "29",
+    "quote": "If I know what love is, it is because of you.",
+    "author": "Hermann Hesse",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "30",
+    "quote": "The best thing to hold onto in life is each other.",
+    "author": "Audrey Hepburn",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "31",
+    "quote": "It is not that we have a short time to live, but that we waste a lot of it.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "32",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "33",
+    "quote": "Man conquers the world by conquering himself.",
+    "author": "Zeno of Citium",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "34",
+    "quote": "If I know what love is, it is because of you.",
+    "author": "Hermann Hesse",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "35",
+    "quote": "Do not take life too seriously. You will never get out of it alive.",
+    "author": "Elbert Hubbard",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "36",
+    "quote": "Good friends, good books and a sleepy conscience: this is the ideal life.",
+    "author": "Mark Twain",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "37",
+    "quote": "The secret to a happy marriage is if you can be at peace with someone within four walls.",
+    "author": "Bruce Forsyth",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "38",
+    "quote": "You have bewitched me, body and soul, and I love, I love, I love you.",
+    "author": "Jane Austen",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "39",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "40",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "41",
+    "quote": "You have bewitched me, body and soul, and I love, I love, I love you.",
+    "author": "Jane Austen",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "42",
+    "quote": "There is no more lovely, friendly and charming relationship than a good marriage.",
+    "author": "Martin Luther",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "43",
+    "quote": "It is not that we have a short time to live, but that we waste a lot of it.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "44",
+    "quote": "The way to get started is to quit talking and begin doing.",
+    "author": "Walt Disney",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "45",
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "46",
+    "quote": "Life isn\u2019t about finding yourself. Life is about creating yourself.",
+    "author": "George Bernard Shaw",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "47",
+    "quote": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "48",
+    "quote": "Love cures people\u2014both the ones who give it and the ones who receive it.",
+    "author": "Karl Menninger",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "49",
+    "quote": "Don\u2019t watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "50",
+    "quote": "Don\u2019t watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "51",
+    "quote": "I love you more than I have ever found a way to say to you.",
+    "author": "Ben Folds",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "52",
+    "quote": "The obstacle on the path becomes the path.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "53",
+    "quote": "Love cures people\u2014both the ones who give it and the ones who receive it.",
+    "author": "Karl Menninger",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "54",
+    "quote": "It is not that we have a short time to live, but that we waste a lot of it.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "55",
+    "quote": "I saw that you were perfect, and so I loved you.",
+    "author": "Angelita Lim",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "56",
+    "quote": "Life isn\u2019t about finding yourself. Life is about creating yourself.",
+    "author": "George Bernard Shaw",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "57",
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "58",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "59",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "60",
+    "quote": "Life isn\u2019t about finding yourself. Life is about creating yourself.",
+    "author": "George Bernard Shaw",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "61",
+    "quote": "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    "author": "Winston Churchill",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "62",
+    "quote": "There is no more lovely, friendly and charming relationship than a good marriage.",
+    "author": "Martin Luther",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "63",
+    "quote": "Life is what happens when you're busy making other plans.",
+    "author": "John Lennon",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "64",
+    "quote": "You have bewitched me, body and soul, and I love, I love, I love you.",
+    "author": "Jane Austen",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "65",
+    "quote": "You have bewitched me, body and soul, and I love, I love, I love you.",
+    "author": "Jane Austen",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "66",
+    "quote": "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    "author": "Winston Churchill",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "67",
+    "quote": "I love you not because of who you are, but because of who I am when I am with you.",
+    "author": "Roy Croft",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "68",
+    "quote": "The obstacle on the path becomes the path.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "69",
+    "quote": "The best thing to hold onto in life is each other.",
+    "author": "Audrey Hepburn",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "70",
+    "quote": "Marriage is our society's most pro-child institution.",
+    "author": "David Blankenhorn",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "71",
+    "quote": "In three words I can sum up everything I\u2019ve learned about life: it goes on.",
+    "author": "Robert Frost",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "72",
+    "quote": "Life isn\u2019t about finding yourself. Life is about creating yourself.",
+    "author": "George Bernard Shaw",
+    "tags": [
+      "life"
+    ]
+  },
+  {
+    "id": "73",
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "74",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "75",
+    "quote": "You have bewitched me, body and soul, and I love, I love, I love you.",
+    "author": "Jane Austen",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "76",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "77",
+    "quote": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "78",
+    "quote": "If I know what love is, it is because of you.",
+    "author": "Hermann Hesse",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "79",
+    "quote": "The best thing to hold onto in life is each other.",
+    "author": "Audrey Hepburn",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "80",
+    "quote": "Marriage is our society's most pro-child institution.",
+    "author": "David Blankenhorn",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "81",
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "82",
+    "quote": "I love you more than I have ever found a way to say to you.",
+    "author": "Ben Folds",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "83",
+    "quote": "Don\u2019t watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "84",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "85",
+    "quote": "Marriage is our society's most pro-child institution.",
+    "author": "David Blankenhorn",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "86",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "87",
+    "quote": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "88",
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "89",
+    "quote": "It is not that we have a short time to live, but that we waste a lot of it.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "90",
+    "quote": "The secret to a happy marriage is if you can be at peace with someone within four walls.",
+    "author": "Bruce Forsyth",
+    "tags": [
+      "marriage"
+    ]
+  },
+  {
+    "id": "91",
+    "quote": "To love and be loved is to feel the sun from both sides.",
+    "author": "David Viscott",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "92",
+    "quote": "Love is composed of a single soul inhabiting two bodies.",
+    "author": "Aristotle",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "93",
+    "quote": "If I know what love is, it is because of you.",
+    "author": "Hermann Hesse",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "94",
+    "quote": "If I know what love is, it is because of you.",
+    "author": "Hermann Hesse",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "95",
+    "quote": "We suffer more often in imagination than in reality.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "96",
+    "quote": "I saw that you were perfect, and so I loved you.",
+    "author": "Angelita Lim",
+    "tags": [
+      "i love you"
+    ]
+  },
+  {
+    "id": "97",
+    "quote": "Hardships often prepare ordinary people for an extraordinary destiny.",
+    "author": "C.S. Lewis",
+    "tags": [
+      "motivation"
+    ]
+  },
+  {
+    "id": "98",
+    "quote": "Love cures people\u2014both the ones who give it and the ones who receive it.",
+    "author": "Karl Menninger",
+    "tags": [
+      "love"
+    ]
+  },
+  {
+    "id": "99",
+    "quote": "The obstacle on the path becomes the path.",
+    "author": "Seneca",
+    "tags": [
+      "stoicism"
+    ]
+  },
+  {
+    "id": "100",
+    "quote": "Where there is love there is life.",
+    "author": "Mahatma Gandhi",
+    "tags": [
+      "love"
+    ]
+  }
+]
