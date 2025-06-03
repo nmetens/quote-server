@@ -1,6 +1,8 @@
 ### Author: Nathan Metens
 ### Professor: Bart Massey
+
 # Quote Server
+
 This repo is a learning experience. 
 
 In the Rust Web Dev class taught by Bart Massey, I follow along with his knock-knock
@@ -13,11 +15,19 @@ the client refreshes the page.
 The methods in this server are asynchronous, so that multiple
 Users can access them simultaneously and view different quotes.
 
-## Quote Server demonstration so far:
-![A famout Quote](static/quote1.jpg)
-![A famout Quote](static/quote2.jpg)
+## Quote Server demonstration:
+
+Before:
+![A famout Quote](assets/static/quote1.jpg)
+![A famout Quote](assets/static/quote2.jpg)
+
+After: 
+![Home Page](assets/static/homepage.png)
+![Api endpoint 1](assets/static/apiendpoint1.png)
+![Api endpoint 2](assets/static/apiendpoint2.png)
 
 ## Resources
+
 - The [random number](https://rust-random.github.io/book/guide-values.html).
 - The JSON file with random quotes about love, marriage, death, stoicism, and life
 were generated using [ChatGPT](https://chatgpt.com/)
