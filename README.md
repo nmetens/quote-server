@@ -18,10 +18,12 @@ Users can access them simultaneously and view different quotes.
 ## Quote Server demonstration:
 
 Before:
+
 ![A famout Quote](assets/static/quote1.jpg)
 ![A famout Quote](assets/static/quote2.jpg)
 
 After: 
+
 ![Home Page](assets/static/homepage.png)
 ![Api endpoint 1](assets/static/apiendpoint1.png)
 ![Api endpoint 2](assets/static/apiendpoint2.png)
