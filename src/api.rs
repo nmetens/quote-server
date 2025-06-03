@@ -8,6 +8,8 @@
 /// AppState is shared between enpoints to allow asynchronous visits.
 /// All quotes are fetched using anychronous calls to the database.
 
+use crate::*;
+
 #[derive(OpenApi)]
 #[openapi(
     tags(
@@ -125,7 +127,7 @@ pub async fn get_random_quote(
         Ok(quote_id) => get_quote_by_id(db, &quote_id).await, // Found the quote.
 
         Err(e) => {
-            log::warn!("get random quote failed: {}", e); // Error occured.
+            log::warn!("get random quote failed: {}", e); // Error
             Err(http::StatusCode::NOT_FOUND)
         }
     }

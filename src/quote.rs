@@ -30,7 +30,7 @@ pub struct Quote {
 }
 
 // Read quotes from the quotes.json and parse them into JsonQuote objects:
-pub fn read_quotes<P: AsRef<Path>>(quotes_path: P) -> Result<Vec<JsonQuote>, FamousQuoteError> {
+pub fn read_quotes<P: AsRef<Path>>(quotes_path: P) -> Result<Vec<JsonQuote>, QuoteError> {
     let f = std::fs::File::open(quotes_path.as_ref())?;
     let quotes = serde_json::from_reader(f)?;
     Ok(quotes)
@@ -64,7 +64,7 @@ impl JsonQuote {
 // Converts a JsonQuote object into an http response type:
 impl axum::response::IntoResponse for &JsonQuote {
     fn into_response(self) -> axum::response::Response {
-        (StatusCode::OK, axum::Json(&self)).into_response()
+        (http::StatusCode::OK, axum::Json(&self)).into_response()
     }
 }
 
@@ -72,8 +72,7 @@ impl axum::response::IntoResponse for &JsonQuote {
 // and returning the quote object and the tags in tuple form:
 pub async fn get(db: &SqlitePool, quote_id: &str) -> Result<(Quote, Vec<String>), sqlx::Error> {
     // Get the quote from the quotes table by the id:
-    let quote = sqlx::query_as("select * from quotes where id = $1;")
-        .bind(quote_id)
+    let quote = sqlx::query_as!(Quote, "select * from quotes where id = $1;", quote_id)
         .fetch_one(db)
         .await?;
 
