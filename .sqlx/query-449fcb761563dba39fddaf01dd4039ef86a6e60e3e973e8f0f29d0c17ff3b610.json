@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "select id from quotes order by random() limit 1;",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "449fcb761563dba39fddaf01dd4039ef86a6e60e3e973e8f0f29d0c17ff3b610"
+}

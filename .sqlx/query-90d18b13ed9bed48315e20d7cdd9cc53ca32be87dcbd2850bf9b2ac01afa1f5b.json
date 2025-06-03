@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "select tag from tags where quote_id = $1;",
+  "describe": {
+    "columns": [
+      {
+        "name": "tag",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "90d18b13ed9bed48315e20d7cdd9cc53ca32be87dcbd2850bf9b2ac01afa1f5b"
+}
