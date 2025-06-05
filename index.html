@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Famous Quotes</title>
+    <link data-trunk rel="rust" data-wasm-opt="0" data-keep-debug=true />
+    <link rel="stylesheet" href="{{stylesheet}}">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Quote</h1>
+      <div class="quote">
+        <span>{{quote.quote}}</span><br/>
+      </div>
+      <div class="info">
+        <span class="source">Author: {{quote.author}}</span>
+        <span class="tags">Theme: {{tags}}</span>
+      </div>
+      <form>
+        <label>Select a theme (or leave blank for a random theme):</label>
+        <input type="text" name="tags"/>
+        <button type="submit">New Quote</button>
+      </form>
+    </div>
+  </body>
+</html>

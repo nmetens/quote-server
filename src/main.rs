@@ -18,6 +18,7 @@ use axum::{
     response::{self, IntoResponse},
     routing,
 };
+
 use clap::Parser;
 extern crate fastrand;
 use serde::{Serialize, Deserialize};
@@ -34,6 +35,8 @@ use utoipa_swagger_ui::SwaggerUi;
 use std::borrow::Cow;
 use std::sync::Arc;
 use tower_http::services::ServeDir;
+
+use leptos::prelude::*;
 
 // Create the Args struct for the command line interface.
 // Useful for parsing flags such as '--init_from', '--db_uri', '--port'
@@ -236,7 +239,27 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[component]
+fn App() -> impl IntoView {
+    //let (count, set_count) = signal(0);
+
+    view! {
+        /*<button
+            on:click=move |_| {
+                *set_count.write() += 1;
+            }
+        >
+            {move || if count.get() == 0 {
+                "Click me".to_string()
+            } else {
+                count.get().to_string()
+            }}
+        </button>*/
+    }
+}
+
 #[tokio::main]
 async fn main() {
     serve().await.expect("No famous quote found");
+    leptos::mount::mount_to_body(App)
 }
