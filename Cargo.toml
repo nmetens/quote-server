@@ -15,8 +15,13 @@ mime = "0.3.17"
 serde_json = "1.0.140"
 thiserror = "2.0.12"
 tracing = "0.1.41"
-leptos = { version = "0.7.0", features = ["csr"] }
+leptos = { version = "0.8.2", features = ["csr"] }
+leptos_axum = "0.7.0"  # same version as Leptos
 console_error_panic_hook = "0.1.7"
+reqwasm = "0.5.0"
+send_wrapper = "0.6.0"
+tracing-subscriber-wasm = "0.1.0"
+web-sys = { version = "0.3.77", features = ["AbortController", "AbortSignal"] }
 
 [dependencies.clap]
 version = "4.5.38"

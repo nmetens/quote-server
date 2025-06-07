@@ -20,7 +20,6 @@ use axum::{
 };
 
 use clap::Parser;
-extern crate fastrand;
 use serde::{Serialize, Deserialize};
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
 use tokio::{net, sync::RwLock};
@@ -36,7 +35,9 @@ use std::borrow::Cow;
 use std::sync::Arc;
 use tower_http::services::ServeDir;
 
-use leptos::prelude::*;
+use leptos::*;
+use leptos_axum::{generate_route_list, LeptosRoutes};
+use leptos_config::{get_configuration, ConfFile};
 
 // Create the Args struct for the command line interface.
 // Useful for parsing flags such as '--init_from', '--db_uri', '--port'
@@ -94,8 +95,20 @@ fn extract_db_dir(db_uri: &str) -> Result<&str, QuoteError> {
     }
 }
 
+#[component]
+fn App() -> impl IntoView {
+    view! {
+        <h1>"Welcome to Leptos!"</h1>
+        <p>"This is the app."</p>
+    }
+}
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
+    // Leptos setup (Client side rendering (CSR):
+    let conf = config::get_configuration(None).wait?;
+    let leptos_options: Option<ConfFile> = Some(conf.leptos_options)?;
+    let routes = generate_route_list(App);*/
+
     let args = Args::parse(); // Parse the cli arguments and flags.
 
     // Get the database uri.
@@ -215,6 +228,12 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
             services::ServeFile::new_with_mime("assets/static/heart.png", &mime::IMAGE_PNG),
         )
         .nest_service("/static", ServeDir::new("assets/static"))
+        .leptos_routes(&leptos_options, routes, App)
+        .nest_service("/pkg", ServeDir::new(leptos_options.site_pkg_dir))
+        .fallback(leptos_axum::render_app_to_stream(
+            leptos_options.clone(),
+            LeptosApp,
+        ))
         .merge(swagger_ui)
         .merge(redoc_ui)
         .merge(rapidoc_ui)
@@ -239,27 +258,9 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-#[component]
-fn App() -> impl IntoView {
-    //let (count, set_count) = signal(0);
 
-    view! {
-        /*<button
-            on:click=move |_| {
-                *set_count.write() += 1;
-            }
-        >
-            {move || if count.get() == 0 {
-                "Click me".to_string()
-            } else {
-                count.get().to_string()
-            }}
-        </button>*/
-    }
-}
 
 #[tokio::main]
 async fn main() {
     serve().await.expect("No famous quote found");
-    leptos::mount::mount_to_body(App)
 }

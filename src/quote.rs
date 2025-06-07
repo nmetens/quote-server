@@ -8,27 +8,45 @@ use std::collections::HashSet;
 use std::ops::Deref;
 use std::path::Path;
 
+use leptos::prelude::*:
+
 use crate::QuoteError;
 
 use serde::Deserialize;
 
 // Struct that sends Json quotes over the api:
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+/*#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct JsonQuote {
     id: String, // Unique id "1", "2", etc.
     quote: String, // The famous quote.
     author: String, // Author of the quote.
     tags: HashSet<String>, // Set of tags (themes) of the quote: ['love', 'life']
-}
+}*/
 
 // The famous quote struct. Contains and id, a quote, and its author:
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Quote {
     pub id: String,
     pub quote: String,
     pub author: String,
 }
 
+pub async fn fetch(endpoint: String) -> Result<Quote, Error> {
+    use reqwasm::http::Request;
+
+    let ep = format!(
+        "http://localhost:3000/api/v1/{}",
+        endpoint,
+    );
+    let result = Request::get(&ep)
+        .send()
+        .await?
+        // convert it to JSON
+        .json()
+        .await?;
+    Ok(result)
+}
+/*
 // Read quotes from the quotes.json and parse them into JsonQuote objects:
 pub fn read_quotes<P: AsRef<Path>>(quotes_path: P) -> Result<Vec<JsonQuote>, QuoteError> {
     let f = std::fs::File::open(quotes_path.as_ref())?;
@@ -138,4 +156,4 @@ pub async fn get_random(db: &SqlitePool) -> Result<String, sqlx::Error> {
     sqlx::query_scalar!("select id from quotes order by random() limit 1;")
         .fetch_one(db)
         .await
-}
+}*/
