@@ -202,15 +202,15 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     // Build the app router. Connections to the styling, favicon, static files, etc.
     let app = axum::Router::new()
         .route("/", routing::get(web::get_quote))
-        .route_service(
+        /* .route_service(
             "/quote.css",
             services::ServeFile::new_with_mime("assets/static/quote.css", &mime::TEXT_CSS_UTF_8),
         )
         .route_service(
             "/favicon.ico",
             services::ServeFile::new_with_mime("assets/static/heart.png", &mime::IMAGE_PNG),
-        )
-        .nest_service("/static", ServeDir::new("assets/static"))
+        )*/
+        //.nest_service("/static", ServeDir::new("assets/static"))
         .merge(swagger_ui)
         .merge(redoc_ui)
         .merge(rapidoc_ui)

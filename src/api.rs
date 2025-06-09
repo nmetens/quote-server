@@ -63,45 +63,53 @@ pub async fn get_quote(
 
     get_quote_by_id(db, &quote_id).await // Call method and pass database and id to extract quote from database.
 }
+use axum::extract::Query;
+use std::collections::HashMap;
 
-
-// Route created: /tagged-quote
 #[utoipa::path(
     get,
     path = "/tagged-quote",
+    params(
+        ("tags" = Option<String>, Query, description = "Comma-separated tags")
+    ),
     responses(
         (status = 200, description = "Get a quote by tags", body = [JsonQuote]),
         (status = 404, description = "No matching quotes"),
     )
 )]
 pub async fn get_tagged_quote(
-    State(app_state): State<Arc<RwLock<AppState>>>, // Grab the shared app state.
-    Json(tags): Json<Vec<String>>, // Grab the tags from the json.
+    State(app_state): State<Arc<RwLock<AppState>>>,
+    Query(tags_param): Query<HashMap<String, String>>,  // Use HashMap to extract 'tags'
 ) -> Result<response::Response, http::StatusCode> {
+    let tags_string = tags_param.get("tags").cloned().unwrap_or_default();
 
-    log::info!("get tagged quote: {:?}", tags); // Print the result.
+    let tags: Vec<String> = tags_string
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
 
-    // As before, get the app state and db:
-    let app_reader = app_state.read().await; 
+    log::info!("get tagged quote: {:?}", tags);
+
+    let app_reader = app_state.read().await;
     let db = &app_reader.db;
 
-    // The resulting quote from the tags by random:
     let quote_result = quote::get_tagged(db, tags.iter().map(String::as_ref)).await;
 
     match quote_result {
-        Ok(Some(quote_id)) => get_quote_by_id(db, &quote_id).await, // Matching quote found and returned.
-
+        Ok(Some(quote_id)) => get_quote_by_id(db, &quote_id).await,
         Ok(None) => {
-            log::warn!("quote tag fetch failed tagging"); // There was no tag like the one provided in the database.
+            log::warn!("quote tag fetch failed tagging");
             Err(http::StatusCode::NOT_FOUND)
         }
-
         Err(e) => {
-            log::warn!("quote tag fetch failed: {}", e); // Error occured in db.
+            log::warn!("quote tag fetch failed: {}", e);
             Err(http::StatusCode::NOT_FOUND)
         }
     }
 }
+
+
 
 // Route created: /random-quote
 // Grabs a random quote from the database.
