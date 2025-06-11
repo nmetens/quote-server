@@ -1,7 +1,6 @@
 /// This file defines the JsonQuote and the Quote structs. The Json Quote allows movement of quote
 /// data over the api. The Quote struct is used to create quotes and grab them from the database.
 /// This file has the functions that get the tags and Quotes from the database.
-
 use crate::*;
 
 use std::collections::HashSet;
@@ -15,9 +14,9 @@ use serde::Deserialize;
 // Struct that sends Json quotes over the api:
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct JsonQuote {
-    pub id: String, // Unique id "1", "2", etc.
-    pub quote: String, // The famous quote.
-    pub author: String, // Author of the quote.
+    pub id: String,            // Unique id "1", "2", etc.
+    pub quote: String,         // The famous quote.
+    pub author: String,        // Author of the quote.
     pub tags: HashSet<String>, // Set of tags (themes) of the quote: ['love', 'life']
 }
 
@@ -77,22 +76,25 @@ pub async fn get(db: &SqlitePool, quote_id: &str) -> Result<(Quote, Vec<String>)
         .await?;
 
     // Get the tag from the tags table where the quote id is matched:
-    let tags: Vec<String> = sqlx::query_scalar!("select tag from tags where quote_id = $1;", quote_id)
-        .fetch_all(db)
-        .await?;
+    let tags: Vec<String> =
+        sqlx::query_scalar!("select tag from tags where quote_id = $1;", quote_id)
+            .fetch_all(db)
+            .await?;
 
     Ok((quote, tags)) // Return the tuple.
 }
 
-
 // Given the database pool and the tags, get a quote from the db that matches that tag:
 pub async fn get_tagged<'a, I>(db: &SqlitePool, tags: I) -> Result<Option<String>, sqlx::Error>
-    where I: Iterator<Item=&'a str>
+where
+    I: Iterator<Item = &'a str>,
 {
     let mut qtx = db.begin().await?; // Begin a transaction with the databse.
 
     // Drop the qtags table (if it exists), then create a temporary table called qtags with one column: tag.
-    sqlx::query("drop table if exists qtags;").execute(&mut *qtx).await?;
+    sqlx::query("drop table if exists qtags;")
+        .execute(&mut *qtx)
+        .await?;
     sqlx::query("create temporary table qtags (tag varchar(200));")
         .execute(&mut *qtx)
         .await?;
@@ -107,26 +109,27 @@ pub async fn get_tagged<'a, I>(db: &SqlitePool, tags: I) -> Result<Option<String
 
     // Join the temporary qtags table with the persistant tags table on the tag column.
     // Select only the unique tags from that join, and select the top one at random:
-    let quote_ids = sqlx::query("
+    let quote_ids = sqlx::query(
+        "
             select distinct quote_id 
             from tags 
             join qtags 
             on tags.tag = qtags.tag 
             order by random() 
-            limit 1;")
-        .fetch_all(&mut *qtx)
-        .await?;
+            limit 1;",
+    )
+    .fetch_all(&mut *qtx)
+    .await?;
 
     // Get the quote ids generated from the previous query:
     let nquote_ids = quote_ids.len();
 
     // If there is one quote id, return it as the result.
-    let result = 
-        if nquote_ids == 1 {
-            Some(quote_ids[0].get(0))
-        } else {
-            None
-        };
+    let result = if nquote_ids == 1 {
+        Some(quote_ids[0].get(0))
+    } else {
+        None
+    };
 
     qtx.commit().await?; // End and commit the transaction that started at the top of this function.
 

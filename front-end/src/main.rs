@@ -7,10 +7,7 @@ pub fn main() {
     use tracing_subscriber_wasm::MakeConsoleWriter;
 
     fmt()
-        .with_writer(
-            MakeConsoleWriter::default()
-                .map_trace_level_to(tracing::Level::DEBUG),
-        )
+        .with_writer(MakeConsoleWriter::default().map_trace_level_to(tracing::Level::DEBUG))
         .without_time()
         .init();
 
@@ -75,19 +72,17 @@ fn fetch_quote() -> impl IntoView {
                 let theme = theme_input.get();
                 if theme.trim().is_empty() {
                     set_endpoint.set("random-quote".to_string());
-                } else {
-                    if theme.chars().all(|c| c.is_digit(10)) {
+                } else if theme.chars().all(|c| c.is_ascii_digit()) {
                         // It's a number → quote by ID
                         set_endpoint.set(format!("quote/{}", theme));
-                    } else {
-                        // Not a number → treat as tag(s)
-                        let tags = theme
-                            .split(',')
-                            .map(|s| s.trim())
-                            .collect::<Vec<_>>()
-                            .join(",");
-                        set_endpoint.set(format!("tagged-quote?tags={}", tags));
-                    }
+                } else {
+                    // Not a number → treat as tag(s)
+                    let tags = theme
+                        .split(',')
+                        .map(|s| s.trim())
+                        .collect::<Vec<_>>()
+                        .join(",");
+                    set_endpoint.set(format!("tagged-quote?tags={}", tags));
                 }
             }>
                 <label>"Select a theme, quote id, or leave blank for a random theme:"</label><br/>

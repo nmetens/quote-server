@@ -1,9 +1,9 @@
 // From https://github.com/shuttle-hq/shuttle-examples/axum/jwt-authentication
 
-use crate::*;
 use crate::http::StatusCode;
-use chrono::Utc;
+use crate::*;
 use chrono::TimeDelta;
+use chrono::Utc;
 
 pub struct JwtKeys {
     encoding: EncodingKey,
@@ -19,9 +19,10 @@ impl JwtKeys {
     }
 }
 
-pub async fn read_secret(env_var: &str, default: &str) ->
-    Result<String, Box<dyn std::error::Error>>
-{
+pub async fn read_secret(
+    env_var: &str,
+    default: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
     let secretf = std::env::var(env_var).unwrap_or_else(|_| default.to_owned());
     let secret = tokio::fs::read_to_string(secretf).await?;
     Ok(secret.trim().to_string())
@@ -46,7 +47,8 @@ impl utoipa::PartialSchema for AuthError {
     fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::Schema> {
         serde_json::json!({
             "status":"401","error":"wrong credentials"
-        }).into()
+        })
+        .into()
     }
 }
 
@@ -76,8 +78,11 @@ impl IntoResponse for AuthBody {
 impl axum::extract::FromRequestParts<SharedAppState> for Claims {
     type Rejection = AuthError;
 
-    async fn from_request_parts(parts: &mut http::request::Parts, state: &SharedAppState) -> Result<Self, Self::Rejection> {
-        use jsonwebtoken::{Algorithm, Validation, decode};
+    async fn from_request_parts(
+        parts: &mut http::request::Parts,
+        state: &SharedAppState,
+    ) -> Result<Self, Self::Rejection> {
+        use jsonwebtoken::{decode, Algorithm, Validation};
 
         // Extract the token from the authorization header
         let TypedHeader(Authorization(bearer)) = parts
@@ -88,11 +93,7 @@ impl axum::extract::FromRequestParts<SharedAppState> for Claims {
         let appstate = state.read().await;
         let decoding_key = &appstate.jwt_keys.decoding;
         let validation = Validation::new(Algorithm::HS512);
-        let result = decode::<Claims>(
-            bearer.token(),
-            decoding_key,
-            &validation,
-        );
+        let result = decode::<Claims>(bearer.token(), decoding_key, &validation);
         let token_data = result.map_err(|_| AuthError::Registration)?;
         Ok(token_data.claims)
     }
@@ -133,9 +134,12 @@ pub struct Claims {
     exp: u64,
 }
 
-pub fn make_jwt_token(appstate: &AppState, registration: &Registration) -> Result<AuthBody, AuthError> {
-    use jsonwebtoken::{Algorithm, Header, encode};
-    
+pub fn make_jwt_token(
+    appstate: &AppState,
+    registration: &Registration,
+) -> Result<AuthBody, AuthError> {
+    use jsonwebtoken::{encode, Algorithm, Header};
+
     if registration.password != appstate.reg_key {
         return Err(AuthError::Registration);
     }

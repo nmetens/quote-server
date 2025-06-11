@@ -2,7 +2,7 @@
 // examples, where variants appear throughout.
 
 use leptos::prelude::*;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
 // The famous quote struct. Contains and id, a quote, and its author:
@@ -17,10 +17,7 @@ pub struct Quote {
 pub async fn fetch(endpoint: String) -> Result<Quote, Error> {
     use reqwasm::http::Request;
 
-    let ep = format!(
-        "http://localhost:8000/api/v1/{}",
-        endpoint,
-    );
+    let ep = format!("http://localhost:8000/api/v1/{}", endpoint,);
     println!("endpoint: {}", endpoint);
     let result = Request::get(&ep)
         .send()

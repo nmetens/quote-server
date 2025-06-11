@@ -1,19 +1,18 @@
+use crate::authjwt::make_jwt_token;
+use crate::authjwt::AuthBody;
+use crate::authjwt::AuthError;
+use crate::authjwt::Registration;
+use crate::http::StatusCode;
 /// This file derives the OpenApi documentation for the ApiDoc struct.
-/// There are three endpoints in this API: 
+/// There are three endpoints in this API:
 ///     1) get_quote
 ///     2) get_tagged_quote
-///     3) get_random_quote 
+///     3) get_random_quote
 /// It uses utoipa for OpenAPI generation of the Swagger compatible docs.
 /// There is a get_quote_by_id asychrnous method that is used in all api methods.
 /// AppState is shared between enpoints to allow asynchronous visits.
 /// All quotes are fetched using anychronous calls to the database.
-
 use crate::*;
-use crate::http::StatusCode;
-use crate::authjwt::Registration;
-use crate::authjwt::AuthBody;
-use crate::authjwt::AuthError;
-use crate::authjwt::make_jwt_token;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -53,14 +52,17 @@ pub async fn register(
 }
 
 // Method that queries the database looking for the quote_id that is passed in as an argument.
-async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<response::Response, http::StatusCode> {
-
+async fn get_quote_by_id(
+    db: &SqlitePool,
+    quote_id: &str,
+) -> Result<response::Response, http::StatusCode> {
     let quote_result = quote::get(db, quote_id).await; // The resulting quote to return.
 
     match quote_result {
         Ok((quote, tags)) => Ok(JsonQuote::new(quote, tags).into_response()), // Wrap the quote and tags in JsonQuote struct.
 
-        Err(e) => { // Quote was not found by the id provided. 404 not found displayed.
+        Err(e) => {
+            // Quote was not found by the id provided. 404 not found displayed.
             log::warn!("quote fetch failed: {}", e);
             Err(http::StatusCode::NOT_FOUND)
         }
@@ -79,9 +81,8 @@ async fn get_quote_by_id(db: &SqlitePool, quote_id: &str) -> Result<response::Re
 )]
 pub async fn get_quote(
     State(app_state): State<Arc<RwLock<AppState>>>, // Grab the app_state.
-    Path(quote_id): Path<String>, // Grab the quote id from the url.
+    Path(quote_id): Path<String>,                   // Grab the quote id from the url.
 ) -> Result<response::Response, http::StatusCode> {
-
     let app_reader = app_state.read().await; // Extract the app state.
 
     let db = &app_reader.db; // Grab the common database that is shared amoungst resources.
@@ -104,7 +105,7 @@ use std::collections::HashMap;
 )]
 pub async fn get_tagged_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
-    Query(tags_param): Query<HashMap<String, String>>,  // Use HashMap to extract 'tags'
+    Query(tags_param): Query<HashMap<String, String>>, // Use HashMap to extract 'tags'
 ) -> Result<response::Response, http::StatusCode> {
     let tags_string = tags_param.get("tags").cloned().unwrap_or_default();
 
@@ -147,7 +148,6 @@ pub async fn get_tagged_quote(
 pub async fn get_random_quote(
     State(app_state): State<Arc<RwLock<AppState>>>, // Extract the shared app state.
 ) -> Result<response::Response, http::StatusCode> {
-
     let app_reader = app_state.read().await;
 
     let db = &app_reader.db; // Grab the database.
@@ -177,10 +177,9 @@ pub async fn get_random_quote(
 )]
 pub async fn add_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
-    claims: authjwt::Claims,
+    _claims: authjwt::Claims,
     axum::Json(json_quote): axum::Json<JsonQuote>,
 ) -> Result<impl axum::response::IntoResponse, StatusCode> {
-
     println!("Quote added: {:?}", json_quote);
 
     let app_reader = app_state.read().await;
@@ -246,7 +245,7 @@ pub async fn add_quote(
 )]
 pub async fn delete_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
-    claims: authjwt::Claims,
+    _claims: authjwt::Claims,
     Path(quote_id): Path<String>,
 ) -> Result<impl IntoResponse, StatusCode> {
     let app_reader = app_state.read().await;
@@ -300,7 +299,7 @@ pub async fn delete_quote(
 )]
 pub async fn get_all_quotes(
     State(app_state): State<Arc<RwLock<AppState>>>,
-    claims: authjwt::Claims,
+    _claims: authjwt::Claims,
 ) -> Result<impl IntoResponse, StatusCode> {
     let app_reader = app_state.read().await;
     let db = &app_reader.db;
@@ -316,16 +315,14 @@ pub async fn get_all_quotes(
     let mut quotes = Vec::new();
 
     for row in rows {
-        let tags: Vec<String> = sqlx::query_scalar!(
-            "SELECT tag FROM tags WHERE quote_id = ?;",
-            row.id
-        )
-        .fetch_all(db)
-        .await
-        .map_err(|e| {
-            log::error!("Failed to fetch tags for quote {}: {}", row.id, e);
-            StatusCode::INTERNAL_SERVER_ERROR
-        })?;
+        let tags: Vec<String> =
+            sqlx::query_scalar!("SELECT tag FROM tags WHERE quote_id = ?;", row.id)
+                .fetch_all(db)
+                .await
+                .map_err(|e| {
+                    log::error!("Failed to fetch tags for quote {}: {}", row.id, e);
+                    StatusCode::INTERNAL_SERVER_ERROR
+                })?;
 
         let quote = JsonQuote::new(
             Quote {

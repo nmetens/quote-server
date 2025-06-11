@@ -1,7 +1,7 @@
-mod error;
-mod quote;
 mod api;
 mod authjwt;
+mod error;
+mod quote;
 
 use error::*;
 use quote::*;
@@ -11,25 +11,23 @@ extern crate mime;
 
 use axum::{
     self,
-    extract::{Path, Query, State, Json},
-    http::{self, StatusCode},
-    RequestPartsExt,
+    extract::{Json, Path, State},
+    http::{self},
     response::{self, IntoResponse},
-    routing,
+    RequestPartsExt,
 };
 use axum_extra::{
     headers::{authorization::Bearer, Authorization},
     TypedHeader,
 };
 
-use chrono::{prelude::*, TimeDelta};
-use jsonwebtoken::{EncodingKey, DecodingKey};
 use clap::Parser;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 extern crate fastrand;
-use serde::{Serialize, Deserialize};
-use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
-use tokio::{net, signal, sync::RwLock, time::Duration};
-use tower_http::{services, trace};
+use serde::{Deserialize, Serialize};
+use sqlx::{migrate::MigrateDatabase, sqlite, Row, SqlitePool};
+use tokio::{net, sync::RwLock};
+use tower_http::trace;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::{OpenApi, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -60,16 +58,22 @@ struct AppState {
     db: SqlitePool,
     jwt_keys: authjwt::JwtKeys,
     reg_key: String,
-    current_quote: Quote, // Thec current quote for the initial display.
+    _current_quote: Quote, // Thec current quote for the initial display.
 }
 type SharedAppState = Arc<RwLock<AppState>>;
 impl AppState {
-    pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String, current_quote: Quote) -> Self {
+    pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String) -> Self {
+        // The default quote displayed on the page before any other quote is displayed:
+        let _current_quote = Quote {
+            id: "101".to_string(),
+            quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
+            author: "Turtle".to_string(),
+        };
         Self {
             db,
             jwt_keys,
             reg_key,
-            current_quote,
+            _current_quote,
         }
     }
 }
@@ -92,7 +96,7 @@ fn get_db_uri(db_uri: Option<&str>) -> Cow<str> {
 
 // Function that searches for the quotes.db file by its ending
 // file type, and where it is located in the file system.
-// Checks that the db_uri starts with the 'sqlite://' syntax and 
+// Checks that the db_uri starts with the 'sqlite://' syntax and
 // exists before establishing a connection:
 fn extract_db_dir(db_uri: &str) -> Result<&str, QuoteError> {
     if db_uri.starts_with("sqlite://") && db_uri.ends_with(".db") {
@@ -128,18 +132,6 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     let db = SqlitePool::connect(&db_uri).await?;
     sqlx::migrate!().run(&db).await?; // Run the migrations in the migrations dir.
 
-    let jwt_keys = authjwt::make_jwt_keys().await.unwrap_or_else(|_| {
-        tracing::error!("jwt keys");
-        std::process::exit(1);
-    });
-
-    let reg_key = authjwt::read_secret("REG_PASSWORD", "secrets/reg_password.txt")
-        .await
-        .unwrap_or_else(|_| {
-            tracing::error!("reg password");
-            std::process::exit(1);
-    });
-
     // If a path is given with the '--init_form' command, then load the quotes
     // from that file into the database:
     if let Some(path) = args.init_from {
@@ -165,12 +157,9 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
             for t in ts {
                 let tag_insert =
-                    sqlx::query!("insert into tags (quote_id, tag) values ($1, $2);",
-                        q.id,
-                        t,
-                    )
-                    .execute(&mut *qtx)
-                    .await;
+                    sqlx::query!("insert into tags (quote_id, tag) values ($1, $2);", q.id, t,)
+                        .execute(&mut *qtx)
+                        .await;
 
                 if let Err(e) = tag_insert {
                     eprintln!("error: tag insert: {} {}: {}", q.id.clone(), t, e);
@@ -182,13 +171,6 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         }
         return Ok(());
     }
-    
-    // The default quote displayed on the page before any other quote is displayed:
-    let current_quote = Quote {
-        id: "101".to_string(),
-        quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
-        author: "Turtle".to_string(),
-    };
 
     let jwt_keys = authjwt::make_jwt_keys().await.unwrap_or_else(|_| {
         tracing::error!("jwt keys");
@@ -200,22 +182,22 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or_else(|_| {
             tracing::error!("reg password");
             std::process::exit(1);
-    });
+        });
 
     // Initialize the app state object with the db pool and the initial quote.
-    let app_state = AppState { db, jwt_keys, reg_key, current_quote };
+    let app_state = AppState::new(db, jwt_keys, reg_key);
 
     // Make the state sharable for async reading and writing.
     let state = Arc::new(RwLock::new(app_state));
 
-     // Initialize logging and tracing:
-     tracing_subscriber::registry()
-     .with(
-         tracing_subscriber::EnvFilter::try_from_default_env()
-             .unwrap_or_else(|_| "quote-server=debug,info".into()),
-     )
-     .with(tracing_subscriber::fmt::layer())
-     .init();
+    // Initialize logging and tracing:
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "quote-server=debug,info".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
     // https://carlosmv.hashnode.dev/adding-logging-and-tracing-to-an-axum-app-rust
     let trace_layer = trace::TraceLayer::new_for_http()
@@ -238,8 +220,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/api/v1", api::router())
         .split_for_parts();
 
-    let swagger_ui = SwaggerUi::new("/swagger-ui")
-        .url("/api-docs/openapi.json", api.clone());
+    let swagger_ui = SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", api.clone());
     let redoc_ui = Redoc::with_url("/redoc", api);
     let rapidoc_ui = RapiDoc::new("/api-docs/openapi.json").path("/rapidoc");
 
