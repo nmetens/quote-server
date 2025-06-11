@@ -11,10 +11,8 @@ extern crate mime;
 
 use axum::{
     self,
-    RequestPartsExt,
     extract::{Path, Query, State, Json},
     http::{self, StatusCode},
-    http,
     RequestPartsExt,
     response::{self, IntoResponse},
     routing,
@@ -28,7 +26,6 @@ use chrono::{prelude::*, TimeDelta};
 use jsonwebtoken::{EncodingKey, DecodingKey};
 use clap::Parser;
 extern crate fastrand;
-use jsonwebtoken::{EncodingKey, DecodingKey};
 use serde::{Serialize, Deserialize};
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
 use tokio::{net, signal, sync::RwLock, time::Duration};
@@ -67,30 +64,7 @@ struct AppState {
 }
 type SharedAppState = Arc<RwLock<AppState>>;
 impl AppState {
-    pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String) -> Self {
-        let current_quote = Quote {
-            id: "2000".to_string(),
-            quote: "Yesterday is history, tomorrow is a mystery, and today is a gift. That's why it's called the present.".to_string(),
-            author: "Unknown".to_string(),
-        };
-        Self {
-            db,
-            jwt_keys,
-            reg_key,
-            current_quote,
-        }
-    }
-}
-
-type SharedAppState = Arc<RwLock<AppState>>;
-
-impl AppState {
     pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String, current_quote: Quote) -> Self {
-        /*let current_quote = Quote {
-            id: "1111".to_string(), 
-            quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
-            author: "Unknown".to_string(),
-        };*/
         Self {
             db,
             jwt_keys,
@@ -209,7 +183,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     
-    /*// The default quote displayed on the page before any other quote is displayed:
+    // The default quote displayed on the page before any other quote is displayed:
     let current_quote = Quote {
         id: "101".to_string(),
         quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),

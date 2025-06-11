@@ -28,17 +28,6 @@ After:
 ![Api endpoint 1](assets/static/apiendpoint1.png)
 ![Api endpoint 2](assets/static/apiendpoint2.png)
 
-## API Server Endpoints
-
-To get a random quote from the backend server:
-- http://127.0.0.1:8000/api/v1/random-quote
-
-To fetch a quote by its id:
-- http://127.0.0.1:8000/api/v1/quote/{quote-id}
-
-To fetch a quote by a certain theme (love, live, marriage, stoicism, motivation, i love you):
-- http://127.0.0.1:8000/api/v1/tagged-quote?tags={theme}
-
 ## Check Port Usage
 
 I frequently ran into an issue when re-compiling my code after edits. The issue was that
@@ -56,8 +45,53 @@ wasn't working properly. Here is what I did to fix this issue:
 `echo "super-secret-key" > secrets/jwt_secret.txt`
 `openssl rand -base64 32 > secrets/jwt_secret.txt`
 
-I created a dir called secrets and added a "super-secret-key". I used openssl to create
-a random secret key that i put in the jwt_secret.txt file to solve the issue I was having.
+I also had to make a password in order for all the authentication to work:
+
+`echo "super-secret-password" > secrets/reg_password.txt`
+
+I created a dir called secrets and added a "super-secret-key" and "super-secret-password". 
+I used openssl to create a random secret key that i put in the jwt_secret.txt file to solve 
+the issue I was having. I just made a simple registration password so that I would remember it.
+
+## Authentication Example
+
+To authenticate the API endpoints that change the database such as adding a new quote, deleteing
+a quote by id, or getting all the quotes, I created a login script to register a user, then an auth-post
+script that uses the access_token recieved from the credentials script before. Now a authorized user can 
+add a quote, delete a quote, and see all the quotes.
+
+Here is a demo using curl from the server side of the app:
+
+![login.sh](assets/static/login.png)
+![authenticated-post](assets/static/auth-post.png)
+
+## API Server Endpoints
+
+To get a random quote from the backend server:
+- http://127.0.0.1:8000/api/v1/random-quote
+
+To fetch a quote by its id:
+- http://127.0.0.1:8000/api/v1/quote/{quote-id}
+
+To fetch a quote by a certain theme (love, live, marriage, stoicism, motivation, i love you):
+- http://127.0.0.1:8000/api/v1/tagged-quote?tags={theme}
+
+### Authenticated Endpoints only reachable by a user with credentials:
+
+To become a registered authenticated user:
+- http://127.0.0.1:8000/api/v1/register
+ 
+To add a new quote to the database:
+- http://127.0.0.1:8000/api/v1/add-quote
+
+To remove a quote from the database by id:
+- http://127.0.0.1:8000/api/v1/delete-quote/{quote-id}
+
+To see all the quotes in the database:
+- http://127.0.0.1:8000/api/v1/all-quotes
+
+These endpoints are reachable via curl as demonstrated below:
+![curl](assets/static/curl.png)
 
 ## Resources
 
