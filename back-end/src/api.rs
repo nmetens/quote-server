@@ -10,6 +10,10 @@
 
 use crate::*;
 use crate::http::StatusCode;
+use crate::authjwt::Registration;
+use crate::authjwt::AuthBody;
+use crate::authjwt::AuthError;
+use crate::authjwt::make_jwt_token;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -52,6 +56,23 @@ pub async fn register(
         Err(e) => e.into_response(),
         Ok(token) => (StatusCode::OK, token).into_response(),
     }
+}
+
+#[utoipa::path(
+    post,
+    path = "/register",
+    request_body = Registration,
+    responses(
+        (status = 200, description = "JWT token returned", body = AuthBody),
+        (status = 401, description = "Invalid registration")
+    )
+)]
+pub async fn register(
+    State(app_state): State<Arc<RwLock<AppState>>>,
+    Json(payload): Json<Registration>,
+) -> Result<AuthBody, AuthError> {
+    let reader = app_state.read().await;
+    make_jwt_token(&reader, &payload)
 }
 
 // Method that queries the database looking for the quote_id that is passed in as an argument.

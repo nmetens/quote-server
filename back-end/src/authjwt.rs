@@ -23,16 +23,12 @@ pub async fn read_secret(env_var: &str, default: &str) ->
     Result<String, Box<dyn std::error::Error>>
 {
     let secretf = std::env::var(env_var).unwrap_or_else(|_| default.to_owned());
-    eprintln!("Reading JWT secret from: {}", secretf);
-
     let secret = tokio::fs::read_to_string(secretf).await?;
     Ok(secret.trim().to_string())
 }
 
 pub async fn make_jwt_keys() -> Result<JwtKeys, Box<dyn std::error::Error>> {
-    eprintln!("Loading JWT keys...");
     let secret = read_secret("JWT_SECRETFILE", "secrets/jwt_secret.txt").await?;
-    eprintln!("Secret loaded: {} bytes", secret.len());
     Ok(JwtKeys::new(secret.as_bytes()))
 }
 
