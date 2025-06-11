@@ -1,6 +1,6 @@
 mod error;
 mod quote;
-//mod web;
+mod authjwt;
 mod api;
 
 use error::*;
@@ -13,10 +13,16 @@ use axum::{
     self,
     extract::{Path, Query, State, Json},
     http,
+    RequestPartsExt,
     response::{self, IntoResponse},
     routing,
 };
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization},
+    TypedHeader,
+};
 
+use jsonwebtoken::{EncodingKey, DecodingKey};
 use clap::Parser;
 use serde::{Serialize, Deserialize};
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
@@ -51,7 +57,25 @@ struct Args {
 // Rwlock type.
 struct AppState {
     db: SqlitePool,
+    jwt_keys: authjwt::JwtKeys,
+    reg_key: String,
     current_quote: Quote, // Thec current quote for the initial display.
+}
+type SharedAppState = Arc<RwLock<AppState>>;
+impl AppState {
+    pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String) -> Self {
+        let current_quote = Quote {
+            id: "2000".to_string(),
+            quote: "Yesterday is history, tomorrow is a mystery, and today is a gift. That's why it's called the present.".to_string(),
+            author: "Unknown".to_string(),
+        };
+        Self {
+            db,
+            jwt_keys,
+            reg_key,
+            current_quote,
+        }
+    }
 }
 
 // Method to get the db_uri from the exported env variable.
@@ -102,9 +126,21 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         sqlite::Sqlite::create_database(&db_uri).await?
     }
 
-    // Connect to the database through the uri:
+    // Connect to the database through the uri:/A
     let db = SqlitePool::connect(&db_uri).await?;
     sqlx::migrate!().run(&db).await?; // Run the migrations in the migrations dir.
+
+    let jwt_keys = authjwt::make_jwt_keys().await.unwrap_or_else(|_| {
+        tracing::error!("jwt keys");
+        std::process::exit(1);
+    });
+
+    let reg_key = authjwt::read_secret("REG_PASSWORD", "secrets/reg_password.txt")
+        .await
+        .unwrap_or_else(|_| {
+            tracing::error!("reg password");
+            std::process::exit(1);
+    });
 
     // If a path is given with the '--init_form' command, then load the quotes
     // from that file into the database:
@@ -149,7 +185,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     
-    // The default quote displayed on the page before any other quote is displayed:
+    /*// The default quote displayed on the page before any other quote is displayed:
     let current_quote = Quote {
         id: "101".to_string(),
         quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
@@ -157,8 +193,8 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // Initialize the app state object with the db pool and the initial quote.
-    let app_state = AppState { db, current_quote};
-
+    let app_state = AppState { db, current_quote};*/
+    let app_state = AppState::new(db, jwt_keys, reg_key);
     // Make the state sharable for async reading and writing.
     let state = Arc::new(RwLock::new(app_state));
 
