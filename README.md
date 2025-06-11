@@ -39,6 +39,12 @@ To fetch a quote by its id:
 To fetch a quote by a certain theme (love, live, marriage, stoicism, motivation, i love you):
 - http://127.0.0.1:8000/api/v1/tagged-quote?tags={theme}
 
+## Check Port Usage
+
+I frequently ran into an issue when re-compiling my code after edits. The issue was that
+I got a panick because the "Address was already in use". To check this, I ran the following
+command in the terminal `lsof -i :<PORT>` and if that port had a running instance, I used
+`kill <PID>` to terminate its instance and then recompiled with the run script: `./run.sh`.
 
 ## Resources
 

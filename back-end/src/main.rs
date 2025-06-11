@@ -178,7 +178,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     // Get log:
     let cors = tower_http::cors::CorsLayer::new()
-        .allow_methods([http::Method::GET, http::Method::POST])
+        .allow_methods([http::Method::GET, http::Method::POST, http::Method::DELETE])
         .allow_origin(tower_http::cors::Any);
 
     // Page not found:

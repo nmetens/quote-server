@@ -26,6 +26,7 @@ pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
         .routes(routes!(get_tagged_quote))
         .routes(routes!(get_random_quote))
         .routes(routes!(add_quote))
+        .routes(routes!(delete_quote))
 }
 
 // Method that queries the database looking for the quote_id that is passed in as an argument.
@@ -154,7 +155,8 @@ pub async fn add_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
     axum::Json(json_quote): axum::Json<JsonQuote>,
 ) -> Result<impl axum::response::IntoResponse, StatusCode> {
-    println!("📥 add_quote handler was triggered");
+
+    println!("Quote added: {:?}", json_quote);
 
     let app_reader = app_state.read().await;
     let db = &app_reader.db;
@@ -205,4 +207,56 @@ pub async fn add_quote(
 
     //Ok(StatusCode::OK)
     Ok(axum::Json(json_quote)) // Return the quote back.
+}
+
+#[utoipa::path(
+    delete,
+    path = "/delete-quote/{quote_id}",
+    responses(
+        (status = 200, description = "Quote deleted successfully"),
+        (status = 404, description = "Quote not found"),
+        (status = 500, description = "Database error")
+    )
+)]
+pub async fn delete_quote(
+    State(app_state): State<Arc<RwLock<AppState>>>,
+    Path(quote_id): Path<String>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let app_reader = app_state.read().await;
+    let db = &app_reader.db;
+
+    // Start transaction
+    let mut tx = db.begin().await.map_err(|e| {
+        log::error!("Failed to start transaction: {}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    // First delete tags associated with the quote
+    sqlx::query!("DELETE FROM tags WHERE quote_id = ?;", quote_id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| {
+            log::error!("Failed to delete tags: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    // Then delete the quote
+    let result = sqlx::query!("DELETE FROM quotes WHERE id = ?;", quote_id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| {
+            log::error!("Failed to delete quote: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    if result.rows_affected() == 0 {
+        return Err(StatusCode::NOT_FOUND);
+    }
+
+    tx.commit().await.map_err(|e| {
+        log::error!("Transaction commit failed: {}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    Ok((StatusCode::OK, format!("Quote {} deleted", quote_id)))
 }
