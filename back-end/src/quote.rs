@@ -84,6 +84,36 @@ pub async fn get(db: &SqlitePool, quote_id: &str) -> Result<(Quote, Vec<String>)
     Ok((quote, tags)) // Return the tuple.
 }
 
+
+pub async fn add_quote(db: &SqlitePool, new: NewQuote) -> Result<(), sqlx::Error> {
+    let quote_id = o_string();
+
+    // Insert into the quotes table
+    sqlx::query!(
+        "INSERT INTO quotes (id, text, author) VALUES (?, ?, ?);",
+        quote_id,
+        new.text,
+        new.author
+    )
+    .execute(db)
+    .await?;
+
+    // Insert tags, if any
+    if let Some(tags) = new.tags {
+        for tag in tags {
+            sqlx::query!(
+                "INSERT INTO tags (quote_id, tag) VALUES (?, ?);",
+                quote_id,
+                tag
+            )
+            .execute(db)
+            .await?;
+        }
+    }
+
+    Ok(())
+}
+
 // Given the database pool and the tags, get a quote from the db that matches that tag:
 pub async fn get_tagged<'a, I>(db: &SqlitePool, tags: I) -> Result<Option<String>, sqlx::Error>
     where I: Iterator<Item=&'a str>
