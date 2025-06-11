@@ -1,7 +1,7 @@
 mod error;
 mod quote;
-//mod web;
 mod api;
+mod authjwt;
 
 use error::*;
 use quote::*;
@@ -11,16 +11,23 @@ extern crate mime;
 
 use axum::{
     self,
+    RequestPartsExt,
     extract::{Path, Query, State, Json},
-    http,
+    http::{self, StatusCode},
     response::{self, IntoResponse},
     routing,
 };
-
+use axum_extra::{
+    headers::{authorization::Bearer, Authorization},
+    TypedHeader,
+};
+use chrono::{prelude::*, TimeDelta};
 use clap::Parser;
+extern crate fastrand;
+use jsonwebtoken::{EncodingKey, DecodingKey};
 use serde::{Serialize, Deserialize};
 use sqlx::{Row, SqlitePool, migrate::MigrateDatabase, sqlite};
-use tokio::{net, sync::RwLock};
+use tokio::{net, signal, sync::RwLock, time::Duration};
 use tower_http::{services, trace};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::{OpenApi, ToSchema};
@@ -31,7 +38,6 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use std::borrow::Cow;
 use std::sync::Arc;
-use tower_http::services::ServeDir;
 
 // Create the Args struct for the command line interface.
 // Useful for parsing flags such as '--init_from', '--db_uri', '--port'
@@ -51,7 +57,27 @@ struct Args {
 // Rwlock type.
 struct AppState {
     db: SqlitePool,
+    jwt_keys: authjwt::JwtKeys,
+    reg_key: String,
     current_quote: Quote, // Thec current quote for the initial display.
+}
+
+type SharedAppState = Arc<RwLock<AppState>>;
+
+impl AppState {
+    pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String, current_quote: Quote) -> Self {
+        /*let current_quote = Quote {
+            id: "1111".to_string(), 
+            quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
+            author: "Unknown".to_string(),
+        };*/
+        Self {
+            db,
+            jwt_keys,
+            reg_key,
+            current_quote,
+        }
+    }
 }
 
 // Method to get the db_uri from the exported env variable.
@@ -90,6 +116,8 @@ fn extract_db_dir(db_uri: &str) -> Result<&str, QuoteError> {
 }
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
+    println!("Starting server setup...");
+
     let args = Args::parse(); // Parse the cli arguments and flags.
 
     // Get the database uri.
@@ -156,8 +184,20 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         author: "Turtle".to_string(),
     };
 
+    let jwt_keys = authjwt::make_jwt_keys().await.unwrap_or_else(|_| {
+        tracing::error!("jwt keys");
+        std::process::exit(1);
+    });
+
+    let reg_key = authjwt::read_secret("REG_PASSWORD", "secrets/reg_password.txt")
+        .await
+        .unwrap_or_else(|_| {
+            tracing::error!("reg password");
+            std::process::exit(1);
+    });
+
     // Initialize the app state object with the db pool and the initial quote.
-    let app_state = AppState { db, current_quote};
+    let app_state = AppState { db, jwt_keys, reg_key, current_quote };
 
     // Make the state sharable for async reading and writing.
     let state = Arc::new(RwLock::new(app_state));

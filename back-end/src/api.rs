@@ -144,6 +144,29 @@ pub async fn get_random_quote(
 
 #[utoipa::path(
     post,
+    path = "/register",
+    request_body(
+        content = inline(authjwt::Registration),
+        description = "Get an API key",
+    ),
+    responses(
+        (status = 200, description = "JSON Web Token", body = authjwt::AuthBody),
+        (status = 401, description = "Registration failed", body = authjwt::AuthError),
+    )
+)]
+pub async fn register(
+    State(appstate): State<SharedAppState>,
+    Json(registration): Json<authjwt::Registration>,
+) -> axum::response::Response {
+    let appstate = appstate.read().await;
+    match authjwt::make_jwt_token(&appstate, &registration) {
+        Err(e) => e.into_response(),
+        Ok(token) => (StatusCode::OK, token).into_response(),
+    }
+}
+
+#[utoipa::path(
+    post,
     path = "/add-quote",
     request_body = JsonQuote,
     responses(

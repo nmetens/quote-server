@@ -46,6 +46,19 @@ I got a panick because the "Address was already in use". To check this, I ran th
 command in the terminal `lsof -i :<PORT>` and if that port had a running instance, I used
 `kill <PID>` to terminate its instance and then recompiled with the run script: `./run.sh`.
 
+## Problems With Super Secret Key
+
+I tried for a while to take a step by step approach to implementing the JWT Auth,
+but each time I added some things to the code, the server would not serve the back-end as
+it just had moments ago. This was because I didn't have a super-secret key yet, so the jwt
+wasn't working properly. Here is what I did to fix this issue:
+`mkdir secrets`
+`echo "super-secret-key" > secrets/jwt_secret.txt`
+`openssl rand -base64 32 > secrets/jwt_secret.txt`
+
+I created a dir called secrets and added a "super-secret-key". I used openssl to create
+a random secret key that i put in the jwt_secret.txt file to solve the issue I was having.
+
 ## Resources
 
 - The [random number](https://rust-random.github.io/book/guide-values.html).
