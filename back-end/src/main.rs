@@ -14,6 +14,8 @@ use axum::{
     RequestPartsExt,
     extract::{Path, Query, State, Json},
     http::{self, StatusCode},
+    http,
+    RequestPartsExt,
     response::{self, IntoResponse},
     routing,
 };
@@ -21,7 +23,9 @@ use axum_extra::{
     headers::{authorization::Bearer, Authorization},
     TypedHeader,
 };
+
 use chrono::{prelude::*, TimeDelta};
+use jsonwebtoken::{EncodingKey, DecodingKey};
 use clap::Parser;
 extern crate fastrand;
 use jsonwebtoken::{EncodingKey, DecodingKey};
@@ -60,6 +64,22 @@ struct AppState {
     jwt_keys: authjwt::JwtKeys,
     reg_key: String,
     current_quote: Quote, // Thec current quote for the initial display.
+}
+type SharedAppState = Arc<RwLock<AppState>>;
+impl AppState {
+    pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String) -> Self {
+        let current_quote = Quote {
+            id: "2000".to_string(),
+            quote: "Yesterday is history, tomorrow is a mystery, and today is a gift. That's why it's called the present.".to_string(),
+            author: "Unknown".to_string(),
+        };
+        Self {
+            db,
+            jwt_keys,
+            reg_key,
+            current_quote,
+        }
+    }
 }
 
 type SharedAppState = Arc<RwLock<AppState>>;
@@ -130,9 +150,21 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         sqlite::Sqlite::create_database(&db_uri).await?
     }
 
-    // Connect to the database through the uri:
+    // Connect to the database through the uri:/A
     let db = SqlitePool::connect(&db_uri).await?;
     sqlx::migrate!().run(&db).await?; // Run the migrations in the migrations dir.
+
+    let jwt_keys = authjwt::make_jwt_keys().await.unwrap_or_else(|_| {
+        tracing::error!("jwt keys");
+        std::process::exit(1);
+    });
+
+    let reg_key = authjwt::read_secret("REG_PASSWORD", "secrets/reg_password.txt")
+        .await
+        .unwrap_or_else(|_| {
+            tracing::error!("reg password");
+            std::process::exit(1);
+    });
 
     // If a path is given with the '--init_form' command, then load the quotes
     // from that file into the database:
@@ -177,7 +209,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
     
-    // The default quote displayed on the page before any other quote is displayed:
+    /*// The default quote displayed on the page before any other quote is displayed:
     let current_quote = Quote {
         id: "101".to_string(),
         quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
