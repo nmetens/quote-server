@@ -1,5 +1,7 @@
 #!/bin/bash
 
-cargo build --release
+. "$HOME/.cargo/env" # Gets cargo installed in dir.
 
-trunk serve
+cargo build --release # Build the project.
+
+trunk serve # Run the leptos front-end service.

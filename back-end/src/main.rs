@@ -1,12 +1,10 @@
 mod error;
 mod quote;
-mod templates;
-mod web;
+//mod web;
 mod api;
 
 use error::*;
 use quote::*;
-use templates::*;
 
 extern crate log;
 extern crate mime;
@@ -201,16 +199,6 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     // Build the app router. Connections to the styling, favicon, static files, etc.
     let app = axum::Router::new()
-        .route("/", routing::get(web::get_quote))
-        /* .route_service(
-            "/quote.css",
-            services::ServeFile::new_with_mime("assets/static/quote.css", &mime::TEXT_CSS_UTF_8),
-        )
-        .route_service(
-            "/favicon.ico",
-            services::ServeFile::new_with_mime("assets/static/heart.png", &mime::IMAGE_PNG),
-        )*/
-        //.nest_service("/static", ServeDir::new("assets/static"))
         .merge(swagger_ui)
         .merge(redoc_ui)
         .merge(rapidoc_ui)
@@ -223,11 +211,10 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
     // Set up the address information:
     let localhost = "127.0.0.1";
     let address = format!("{}:{}", localhost, args.port);
-    println!("Server running at http://{}", address);
 
     // Set up the tcp listener with the args.port default to 8000:
     let listener = net::TcpListener::bind(&format!("{}:{}", localhost, args.port)).await?;
-    println!("Listening on {}:{}", localhost, args.port);
+    println!("Server running at http://{}", address);
 
     // Start the server and listen on the correct port:
     axum::serve(listener, app).await?;

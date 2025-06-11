@@ -109,8 +109,6 @@ pub async fn get_tagged_quote(
     }
 }
 
-
-
 // Route created: /random-quote
 // Grabs a random quote from the database.
 #[utoipa::path(

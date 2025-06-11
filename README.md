@@ -28,6 +28,18 @@ After:
 ![Api endpoint 1](assets/static/apiendpoint1.png)
 ![Api endpoint 2](assets/static/apiendpoint2.png)
 
+## API Server Endpoints
+
+To get a random quote from the backend server:
+- http://127.0.0.1:8000/api/v1/random-quote
+
+To fetch a quote by its id:
+- http://127.0.0.1:8000/api/v1/quote/{quote-id}
+
+To fetch a quote by a certain theme (love, live, marriage, stoicism, motivation, i love you):
+- http://127.0.0.1:8000/api/v1/tagged-quote?tags={theme}
+
+
 ## Resources
 
 - The [random number](https://rust-random.github.io/book/guide-values.html).
