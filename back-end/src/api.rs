@@ -21,12 +21,11 @@ pub struct ApiDoc; // Struct to create api references.
 
 // Function that generates all the api endpoints with OpenApi:
 pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
-    OpenApiRouter::new().routes(routes![
-        get_quote,
-        get_tagged_quote,
-        get_random_quote,
-        add_quote
-    ])
+    OpenApiRouter::new()
+        .routes(routes!(get_quote))
+        .routes(routes!(get_tagged_quote))
+        .routes(routes!(get_random_quote))
+        .routes(routes!(add_quote))
 }
 
 // Method that queries the database looking for the quote_id that is passed in as an argument.
@@ -144,23 +143,66 @@ pub async fn get_random_quote(
 #[utoipa::path(
     post,
     path = "/add-quote",
-    request_body = Quote,
+    request_body = JsonQuote,
     responses(
-        (status = 201, description = "Quote added successfully"),
-        (status = 400, description = "Failed to add quote"),
+        (status = 200, description = "Quote added successfully"),
+        (status = 400, description = "Invalid input or duplicate ID"),
+        (status = 500, description = "Server/database error")
     )
 )]
-pub async fn add_quote_handler(
+pub async fn add_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
-    Json(new_quote): Json<JsonQuote>,
-) -> Result<StatusCode, StatusCode> {
-    let db = &app_state.read().await.db;
+    axum::Json(json_quote): axum::Json<JsonQuote>,
+) -> Result<impl axum::response::IntoResponse, StatusCode> {
+    println!("📥 add_quote handler was triggered");
 
-    match quote::add_quote(db, new_quote).await {
-        Ok(_) => Ok(StatusCode::CREATED),
-        Err(e) => {
-            log::error!("Failed to add quote: {}", e);
-            Err(StatusCode::BAD_REQUEST)
-        }
+    let app_reader = app_state.read().await;
+    let db = &app_reader.db;
+
+    let (quote, tags): (Quote, Vec<&str>) = {
+        let (q, t_iter) = json_quote.to_quote();
+        (q, t_iter.collect())
+    };
+
+    let mut tx = db.begin().await.map_err(|e| {
+        log::error!("Failed to start transaction: {}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    // Insert into quotes table
+    sqlx::query!(
+        "INSERT INTO quotes (id, quote, author) VALUES (?, ?, ?);",
+        quote.id,
+        quote.quote,
+        quote.author
+    )
+    .execute(&mut *tx)
+    .await
+    .map_err(|e| {
+        log::warn!("Insert quote failed: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+
+    // Insert associated tags
+    for tag in tags {
+        sqlx::query!(
+            "INSERT INTO tags (quote_id, tag) VALUES (?, ?);",
+            quote.id,
+            tag
+        )
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| {
+            log::error!("Insert tag failed: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
     }
+
+    tx.commit().await.map_err(|e| {
+        log::error!("Transaction commit failed: {}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+
+    //Ok(StatusCode::OK)
+    Ok(axum::Json(json_quote)) // Return the quote back.
 }

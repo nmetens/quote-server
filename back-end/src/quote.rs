@@ -15,10 +15,10 @@ use serde::Deserialize;
 // Struct that sends Json quotes over the api:
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct JsonQuote {
-    id: String, // Unique id "1", "2", etc.
-    quote: String, // The famous quote.
-    author: String, // Author of the quote.
-    tags: HashSet<String>, // Set of tags (themes) of the quote: ['love', 'life']
+    pub id: String, // Unique id "1", "2", etc.
+    pub quote: String, // The famous quote.
+    pub author: String, // Author of the quote.
+    pub tags: HashSet<String>, // Set of tags (themes) of the quote: ['love', 'life']
 }
 
 // The famous quote struct. Contains and id, a quote, and its author:
@@ -84,34 +84,6 @@ pub async fn get(db: &SqlitePool, quote_id: &str) -> Result<(Quote, Vec<String>)
     Ok((quote, tags)) // Return the tuple.
 }
 
-pub async fn add_quote(db: &SqlitePool, new: JsonQuote) -> Result<(), sqlx::Error> {
-    // Insert quote and get the auto-generated ID
-    let result = sqlx::query!(
-        "insert into quotes (quote, author) values (?, ?);",
-        new.quote,
-        new.author
-    )
-    .execute(db)
-    .await?;
-
-    // Get the last inserted row ID (SQLite-specific)
-    let quote_id = result.last_insert_rowid();
-
-    // Insert tags
-    if let HashSet(tags) = new.tags {
-        for tag in tags {
-            sqlx::query!(
-                "insert into tags (quote_id, tag) values (?, ?);",
-                quote_id,
-                tag
-            )
-            .execute(db)
-            .await?;
-        }
-    }
-
-    Ok(())
-}
 
 // Given the database pool and the tags, get a quote from the db that matches that tag:
 pub async fn get_tagged<'a, I>(db: &SqlitePool, tags: I) -> Result<Option<String>, sqlx::Error>
