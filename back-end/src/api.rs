@@ -27,6 +27,7 @@ pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
         .routes(routes!(get_random_quote))
         .routes(routes!(add_quote))
         .routes(routes!(delete_quote))
+        .routes(routes!(get_all_quotes))
 }
 
 // Method that queries the database looking for the quote_id that is passed in as an argument.
@@ -259,4 +260,55 @@ pub async fn delete_quote(
     })?;
 
     Ok((StatusCode::OK, format!("Quote {} deleted", quote_id)))
+}
+
+#[utoipa::path(
+    get,
+    path = "/all-quotes",
+    responses(
+        (status = 200, description = "Get all quotes", body = [JsonQuote]),
+        (status = 500, description = "Database error")
+    )
+)]
+pub async fn get_all_quotes(
+    State(app_state): State<Arc<RwLock<AppState>>>,
+) -> Result<impl IntoResponse, StatusCode> {
+    let app_reader = app_state.read().await;
+    let db = &app_reader.db;
+
+    let rows = sqlx::query!("SELECT id, quote, author FROM quotes")
+        .fetch_all(db)
+        .await
+        .map_err(|e| {
+            log::error!("Failed to fetch quotes: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let mut quotes = Vec::new();
+
+    for row in rows {
+        let tags: Vec<String> = sqlx::query_scalar!(
+            "SELECT tag FROM tags WHERE quote_id = ?;",
+            row.id
+        )
+        .fetch_all(db)
+        .await
+        .map_err(|e| {
+            log::error!("Failed to fetch tags for quote {}: {}", row.id, e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+        let quote = JsonQuote::new(
+            Quote {
+                id: row.id,
+                quote: row.quote,
+                author: row.author,
+            },
+            tags,
+        );
+
+        quotes.push(quote);
+    }
+
+    Ok((StatusCode::OK, axum::Json(quotes)))
 }
