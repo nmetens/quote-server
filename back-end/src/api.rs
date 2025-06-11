@@ -32,6 +32,30 @@ pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
         .routes(routes!(add_quote))
         .routes(routes!(delete_quote))
         .routes(routes!(get_all_quotes))
+        .routes(routes!(register))
+}
+
+#[utoipa::path(
+    post,
+    path = "/register",
+    request_body(
+        content = inline(authjwt::Registration),
+        description = "Get an API key",
+    ),
+    responses(
+        (status = 200, description = "JSON Web Token", body = authjwt::AuthBody),
+        (status = 401, description = "Registration failed", body = authjwt::AuthError),
+    )
+)]
+pub async fn register(
+    State(appstate): State<SharedAppState>,
+    Json(registration): Json<authjwt::Registration>,
+) -> axum::response::Response {
+    let appstate = appstate.read().await;
+    match authjwt::make_jwt_token(&appstate, &registration) {
+        Err(e) => e.into_response(),
+        Ok(token) => (StatusCode::OK, token).into_response(),
+    }
 }
 
 #[utoipa::path(
@@ -165,39 +189,18 @@ pub async fn get_random_quote(
 
 #[utoipa::path(
     post,
-    path = "/register",
-    request_body(
-        content = inline(authjwt::Registration),
-        description = "Get an API key",
-    ),
-    responses(
-        (status = 200, description = "JSON Web Token", body = authjwt::AuthBody),
-        (status = 401, description = "Registration failed", body = authjwt::AuthError),
-    )
-)]
-pub async fn register(
-    State(appstate): State<SharedAppState>,
-    Json(registration): Json<authjwt::Registration>,
-) -> axum::response::Response {
-    let appstate = appstate.read().await;
-    match authjwt::make_jwt_token(&appstate, &registration) {
-        Err(e) => e.into_response(),
-        Ok(token) => (StatusCode::OK, token).into_response(),
-    }
-}
-
-#[utoipa::path(
-    post,
     path = "/add-quote",
     request_body = JsonQuote,
     responses(
         (status = 200, description = "Quote added successfully"),
         (status = 400, description = "Invalid input or duplicate ID"),
+        (status = 401, description = "Auth Error", body = authjwt::AuthError),
         (status = 500, description = "Server/database error")
     )
 )]
 pub async fn add_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
+    claims: authjwt::Claims,
     axum::Json(json_quote): axum::Json<JsonQuote>,
 ) -> Result<impl axum::response::IntoResponse, StatusCode> {
 
@@ -259,12 +262,14 @@ pub async fn add_quote(
     path = "/delete-quote/{quote_id}",
     responses(
         (status = 200, description = "Quote deleted successfully"),
+        (status = 401, description = "Auth Error", body = authjwt::AuthError),
         (status = 404, description = "Quote not found"),
         (status = 500, description = "Database error")
     )
 )]
 pub async fn delete_quote(
     State(app_state): State<Arc<RwLock<AppState>>>,
+    claims: authjwt::Claims,
     Path(quote_id): Path<String>,
 ) -> Result<impl IntoResponse, StatusCode> {
     let app_reader = app_state.read().await;
@@ -311,11 +316,14 @@ pub async fn delete_quote(
     path = "/all-quotes",
     responses(
         (status = 200, description = "Get all quotes", body = [JsonQuote]),
+        (status = 400, description = "Bad request", body = String),
+        (status = 401, description = "Auth Error", body = authjwt::AuthError),
         (status = 500, description = "Database error")
     )
 )]
 pub async fn get_all_quotes(
     State(app_state): State<Arc<RwLock<AppState>>>,
+    claims: authjwt::Claims,
 ) -> Result<impl IntoResponse, StatusCode> {
     let app_reader = app_state.read().await;
     let db = &app_reader.db;
