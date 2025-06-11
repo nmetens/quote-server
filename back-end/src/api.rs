@@ -9,6 +9,7 @@
 /// All quotes are fetched using anychronous calls to the database.
 
 use crate::*;
+use crate::http::StatusCode;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -20,11 +21,12 @@ pub struct ApiDoc; // Struct to create api references.
 
 // Function that generates all the api endpoints with OpenApi:
 pub fn router() -> OpenApiRouter<Arc<RwLock<AppState>>> {
-
-    OpenApiRouter::new()
-        .routes(routes!(get_quote))
-        .routes(routes!(get_tagged_quote))
-        .routes(routes!(get_random_quote))
+    OpenApiRouter::new().routes(routes![
+        get_quote,
+        get_tagged_quote,
+        get_random_quote,
+        add_quote
+    ])
 }
 
 // Method that queries the database looking for the quote_id that is passed in as an argument.
@@ -135,6 +137,30 @@ pub async fn get_random_quote(
         Err(e) => {
             log::warn!("get random quote failed: {}", e); // Error
             Err(http::StatusCode::NOT_FOUND)
+        }
+    }
+}
+
+#[utoipa::path(
+    post,
+    path = "/add-quote",
+    request_body = Quote,
+    responses(
+        (status = 201, description = "Quote added successfully"),
+        (status = 400, description = "Failed to add quote"),
+    )
+)]
+pub async fn add_quote_handler(
+    State(app_state): State<Arc<RwLock<AppState>>>,
+    Json(new_quote): Json<JsonQuote>,
+) -> Result<StatusCode, StatusCode> {
+    let db = &app_state.read().await.db;
+
+    match quote::add_quote(db, new_quote).await {
+        Ok(_) => Ok(StatusCode::CREATED),
+        Err(e) => {
+            log::error!("Failed to add quote: {}", e);
+            Err(StatusCode::BAD_REQUEST)
         }
     }
 }

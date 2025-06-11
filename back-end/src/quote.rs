@@ -84,25 +84,24 @@ pub async fn get(db: &SqlitePool, quote_id: &str) -> Result<(Quote, Vec<String>)
     Ok((quote, tags)) // Return the tuple.
 }
 
-
-pub async fn add_quote(db: &SqlitePool, new: NewQuote) -> Result<(), sqlx::Error> {
-    let quote_id = o_string();
-
-    // Insert into the quotes table
-    sqlx::query!(
-        "INSERT INTO quotes (id, text, author) VALUES (?, ?, ?);",
-        quote_id,
-        new.text,
+pub async fn add_quote(db: &SqlitePool, new: JsonQuote) -> Result<(), sqlx::Error> {
+    // Insert quote and get the auto-generated ID
+    let result = sqlx::query!(
+        "insert into quotes (quote, author) values (?, ?);",
+        new.quote,
         new.author
     )
     .execute(db)
     .await?;
 
-    // Insert tags, if any
-    if let Some(tags) = new.tags {
+    // Get the last inserted row ID (SQLite-specific)
+    let quote_id = result.last_insert_rowid();
+
+    // Insert tags
+    if let HashSet(tags) = new.tags {
         for tag in tags {
             sqlx::query!(
-                "INSERT INTO tags (quote_id, tag) VALUES (?, ?);",
+                "insert into tags (quote_id, tag) values (?, ?);",
                 quote_id,
                 tag
             )
