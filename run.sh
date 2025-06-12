@@ -33,6 +33,6 @@ cleanup() {
 trap cleanup EXIT
 
 # Start front-end
-cd "$ROOT_DIR/front-end"
-echo "🎨 Starting front-end..."
+cd "$ROOT_DIR/frontend"
+echo "🎨 Starting frontend..."
 trunk serve

@@ -65,6 +65,9 @@ git clone git@github.com:nmetens/quote-server.git
 cd quote-server
 ```
 
+Make sure you have set-up the super-secret stuff in the back-end dir...
+[Secrets](#problems-with-super-secret-key)
+
 Initialize and run both backend and frontend with the helper script:
 ```bash
 ./run.sh
@@ -106,13 +109,32 @@ I tried for a while to take a step by step approach to implementing the JWT Auth
 but each time I added some things to the code, the server would not serve the back-end as
 it just had moments ago. This was because I didn't have a super-secret key yet, so the jwt
 wasn't working properly. Here is what I did to fix this issue:
+
+Inside the back-end dir:
 `mkdir secrets`
 `echo "super-secret-key" > secrets/jwt_secret.txt`
 `openssl rand -base64 32 > secrets/jwt_secret.txt`
 
 I also had to make a password in order for all the authentication to work:
 
-`echo "super-secret-password" > secrets/reg_password.txt`
+`echo "password123" > secrets/reg_password.txt`
+
+Also, change the REG_PASSWORD in the .env folder to match.
+
+![reg](assets/static/reg.png)
+
+Then call the `./login.sh` script in the back-end dir to get the access_tocken (will change each time):
+
+![access_token](assets/static/access_token.png)
+
+Then you can change the `TOKEN` variable in the `./auth-post.sh` script in the back-end dir to the 
+access_token to be able to do adding, deleting, and seeing all the quotes in the server:
+
+![change_token](assets/static/change_token.png)
+
+Now when you run the `./auth-post.sh`, you get all three as a demo:
+
+![output](assets/static/output.png)
 
 I created a dir called secrets and added a "super-secret-key" and "super-secret-password". 
 I used openssl to create a random secret key that i put in the jwt_secret.txt file to solve 

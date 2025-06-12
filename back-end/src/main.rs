@@ -128,8 +128,6 @@ fn extract_db_dir(db_uri: &str) -> Result<&str, QuoteError> {
 }
 
 async fn serve() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Starting server setup...");
-
     let args = Args::parse(); // Parse the cli arguments and flags.
 
     // Get the database uri.
