@@ -754,11 +754,11 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper11678 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper11677 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 683, __wbg_adapter_33);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper6062 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper6061 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 596, __wbg_adapter_30);
         return ret;
     };

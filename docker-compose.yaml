@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back-end/db:/app/db               # if you want to persist your SQLite file
+      - ./back-end/secrets:/app/secrets:ro  # mount JWT & reg secrets
+    environment:
+      - DATABASE_URL=sqlite://app/db/quotes.db
+      - JWT_SECRET_PATH=/app/secrets/jwt_secret.txt
+      - REG_PASSWORD_PATH=/app/secrets/reg_password.txt
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+

@@ -1,0 +1,35 @@
+# ┌───────────────────────────────┐
+# │ Stage 1: Compile the backend  │
+# └───────────────────────────────┘
+FROM rust:1.84 AS builder
+WORKDIR /usr/src/app
+
+# Copy only the manifest to cache dependencies
+COPY back-end/Cargo.toml back-end/Cargo.lock ./
+# Create a dummy main so `cargo fetch` populates deps
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN cargo fetch
+
+# Now copy the actual backend source & build it
+COPY back-end ./
+RUN cargo install --path . --locked --root /usr/local
+
+# ┌───────────────────────────────┐
+# │ Stage 2: Create the runtime   │
+# └───────────────────────────────┘
+FROM debian:bullseye-slim
+RUN apt-get update \
+ && apt-get install -y ca-certificates libssl-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy the compiled binary
+COPY --from=builder /usr/local/bin/quote-server /usr/local/bin/quote-server
+# Copy your migrations folder so `sqlx::migrate!()` can find it
+COPY back-end/migrations ./migrations
+
+EXPOSE 8000
+
+CMD ["quote-server"]
+

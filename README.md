@@ -181,6 +181,8 @@ overheat so I had to `cntrl + c` on the Dcoker to avoid damaging my laptop.
 I ultimately abandoned Docker for this project. I'll need to go back and try
 to figure it out another time.
 
+Even with help from AI, I couldn't get the docker-compose to work right...
+
 --- 
 
 ## Conclusion and What I Learned
