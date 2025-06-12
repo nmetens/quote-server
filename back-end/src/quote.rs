@@ -1,6 +1,7 @@
 /// This file defines the JsonQuote and the Quote structs. The Json Quote allows movement of quote
 /// data over the api. The Quote struct is used to create quotes and grab them from the database.
 /// This file has the functions that get the tags and Quotes from the database.
+
 use crate::*;
 
 use std::collections::HashSet;

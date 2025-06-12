@@ -7,8 +7,8 @@
     - Kills the backend process and waits for it to terminate.
     - Prevents zombie processes listening on port 8000.
     - Help from ChatGPT to set this up.
-COMMENT
 
+COMMENT
 set -e
 source "$HOME/.cargo/env"
 

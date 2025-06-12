@@ -1,6 +1,8 @@
 ### Author: Nathan Metens
 ### Professor: Bart Massey
 
+--- 
+
 # Quote Server
 
 In the Rust Web Dev class taught by Bart Massey, I follow along with Bart's knock-knock
@@ -19,10 +21,60 @@ database in SQLX.
 
 The front-end is created using leptos, heavily following Bart's examples and the docs found on the web.
 
+This project introduced me to:
+- **Backend** development with **Axum** and **SQLx**
+- **Frontend** rendering with **Leptos**
+- Secure JWT-based authentication
+- Auto-generated OpenAPI documentation (Swagger, RapiDoc, Redoc)
+
+--- 
+
+## Features
+
+- **Random Quote**: Fetch a random quote on each page load.
+- **Quote by ID**: Fetch a specific quote (e.g., `/?id=19`).
+- **Tag Filtering**: Retrieve quotes by one or multiple tags (quote themes).
+- **CRUD Operations** (Authenticated):
+  - Add new quotes with author and theme.
+  - Delete quotes by ID.
+  - List _all_ quotes in the database.
+- **JWT Auth**: Register users and use bearer tokens to protect write operations.
+- **Interactive Frontend**: Live UI updates powered by Leptos.
+- **API Docs**: Browse and test endpoints via Swagger UI, RapiDoc, and Redoc.
+
+--- 
+
+## Tech Stack
+
+- **Rust**: Language
+- **Axum**: HTTP server & routing
+- **Leptos**: WASM-enabled frontend framework
+- **SQLx**: Async database queries (SQLite)
+- **jsonwebtoken**: JWT creation & validation
+- **utoipa**: OpenAPI generation
+- **Tokio**: Async runtime
+- **tower_http**: CORS & tracing middleware
+
+--- 
+
 ## Running the Project
 
-Once cloned: `git clone git@github.com:nmetens/quote-server.git'` you can simply run the script `./run.sh`.
-This will run both the back-end api endpoints, and the leptos front-end simultaneasouly. 
+Clone the repository and navigate to the root:
+```bash
+git clone git@github.com:nmetens/quote-server.git
+cd quote-server
+```
+
+Initialize and run both backend and frontend with the helper script:
+```bash
+./run.sh
+```
+
+This script will:
+1. Build and launch the Axum backend on `http://127.0.0.1:8000`
+2. Compile and serve the Leptos frontend on `http://127.0.0.1:8080`
+
+--- 
 
 ## Quote Server demonstration:
 
@@ -37,12 +89,16 @@ After:
 ![Api endpoint 1](assets/static/apiendpoint1.png)
 ![Api endpoint 2](assets/static/apiendpoint2.png)
 
+--- 
+
 ## Check Port Usage
 
 I frequently ran into an issue when re-compiling my code after edits. The issue was that
 I got a panick because the "Address was already in use". To check this, I ran the following
 command in the terminal `lsof -i :<PORT>` and if that port had a running instance, I used
 `kill <PID>` to terminate its instance and then recompiled with the run script: `./run.sh`.
+
+--- 
 
 ## Problems With Super Secret Key
 
@@ -62,6 +118,8 @@ I created a dir called secrets and added a "super-secret-key" and "super-secret-
 I used openssl to create a random secret key that i put in the jwt_secret.txt file to solve 
 the issue I was having. I just made a simple registration password so that I would remember it.
 
+--- 
+
 ## Authentication Example
 
 To authenticate the API endpoints that change the database such as adding a new quote, deleteing
@@ -74,6 +132,8 @@ Here is a demo using curl from the server side of the app:
 ![login.sh](assets/static/login.png)
 ![authenticated-post](assets/static/auth-post.png)
 
+--- 
+
 ## API Server Endpoints
 
 To get a random quote from the backend server:
@@ -84,6 +144,8 @@ To fetch a quote by its id:
 
 To fetch a quote by a certain theme (love, live, marriage, stoicism, motivation, i love you):
 - http://127.0.0.1:8000/api/v1/tagged-quote?tags={theme}
+
+--- 
 
 ### Authenticated Endpoints only reachable by a user with credentials:
 
@@ -101,6 +163,40 @@ To see all the quotes in the database:
 
 These endpoints are reachable via curl as demonstrated below:
 ![curl](assets/static/curl.png)
+
+--- 
+
+## Docker
+
+To run the project in Docker, I created two separate Dockerfiles in the front and 
+back end directories with the help of AI. First make sure that the Docker desktop is open on your computer.
+The root of the project has a docker-compose.yaml that can be run like this: `docker-compose up --build`.
+
+Update:
+I tried Docker for 2 hours and nothing was working. I even left my computer for a few hours and the Docker
+build I had tried was still running. I ultimately gave up on Docker, especially since it was a pain to 
+figure out why wasm and trunk weren't installing in a reasonable amount of time. My computer started to 
+overheat so I had to `cntrl + c` on the Dcoker to avoid damaging my laptop.
+
+I ultimately abandoned Docker for this project. I'll need to go back and try
+to figure it out another time.
+
+--- 
+
+## Conclusion and What I Learned
+
+- Building a full-stack Rust application
+- Implementing JWT authentication flows
+- Generating and exploring OpenAPI docs in Rust
+- Integrating a WASM frontend with Leptos
+- Using Curl to Interact with the API back-end
+
+This project was fun and challenging. I had to slowly follow along throughout
+the term, and towards the last few weeks really dive deep to investigate and 
+make sure I understood everything that was happening. I definately learned a 
+lot more about rust taking this class and following the demo.
+
+--- 
 
 ## Resources
 

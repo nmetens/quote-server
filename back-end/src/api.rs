@@ -1,17 +1,22 @@
+/// This file derives the OpenApi documentation for the ApiDoc struct.
+/// These are the endpoints in this API:
+///     1) get_quote
+///     2) get_tagged_quote
+///     3) get_random_quote
+///     4) add_quote 
+///     5) delete_quote 
+///     6) get_all_quotes
+///     7) register via jwt auth
+/// It uses utoipa for OpenAPI generation of the Swagger compatible docs.
+/// There is a get_quote_by_id asychrnous method that is used in all api methods.
+/// AppState is shared between enpoints to allow asynchronous visits.
+/// All quotes are fetched using anychronous calls to the database.
+
 use crate::authjwt::make_jwt_token;
 use crate::authjwt::AuthBody;
 use crate::authjwt::AuthError;
 use crate::authjwt::Registration;
 use crate::http::StatusCode;
-/// This file derives the OpenApi documentation for the ApiDoc struct.
-/// There are three endpoints in this API:
-///     1) get_quote
-///     2) get_tagged_quote
-///     3) get_random_quote
-/// It uses utoipa for OpenAPI generation of the Swagger compatible docs.
-/// There is a get_quote_by_id asychrnous method that is used in all api methods.
-/// AppState is shared between enpoints to allow asynchronous visits.
-/// All quotes are fetched using anychronous calls to the database.
 use crate::*;
 
 #[derive(OpenApi)]
@@ -304,7 +309,7 @@ pub async fn get_all_quotes(
     let app_reader = app_state.read().await;
     let db = &app_reader.db;
 
-    let rows = sqlx::query!("SELECT id, quote, author FROM quotes")
+    let rows = sqlx::query!("SELECT * FROM quotes")
         .fetch_all(db)
         .await
         .map_err(|e| {

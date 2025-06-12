@@ -1,20 +1,34 @@
-mod api;
-mod authjwt;
-mod error;
-mod quote;
+/*
+This Rust backend application uses the Axum framework to serve a quote API with the following features:
+    1) Fetching random, themed, or ID-specific quotes.
+    2) Inserting quotes and tags from a file into a SQLite database.
+    3) JWT-based user authentication and registration.
+    4) Auto-generated Swagger/OpenAPI documentation.
+    5) Secure and observable with CORS and tracing support.
+*/
 
+mod api;         // REST API route handlers and OpenAPI docs
+mod authjwt;     // JWT key generation, encoding, decoding
+mod error;       // Custom error types
+mod quote;       // Quote models and DB logic
+mod templates;   // HTML rendering
+mod web;         // HTML handler endpoints
+
+// The rest of the imports are the same as Bart's main.rs file:
 use error::*;
 use quote::*;
+use templates::*;
 
 extern crate log;
 extern crate mime;
 
 use axum::{
     self,
-    extract::{Json, Path, State},
+    extract::{Json, Query, Path, State},
     http::{self},
     response::{self, IntoResponse},
     RequestPartsExt,
+    routing,
 };
 use axum_extra::{
     headers::{authorization::Bearer, Authorization},
@@ -58,13 +72,13 @@ struct AppState {
     db: SqlitePool,
     jwt_keys: authjwt::JwtKeys,
     reg_key: String,
-    _current_quote: Quote, // Thec current quote for the initial display.
+    current_quote: Quote, // Thec current quote for the initial display.
 }
 type SharedAppState = Arc<RwLock<AppState>>;
 impl AppState {
     pub fn new(db: SqlitePool, jwt_keys: authjwt::JwtKeys, reg_key: String) -> Self {
         // The default quote displayed on the page before any other quote is displayed:
-        let _current_quote = Quote {
+        let current_quote = Quote {
             id: "101".to_string(),
             quote: "Yesterday is history, tomorrow is a mystery, and today is a gift, that's why it's called the present.".to_string(),
             author: "Turtle".to_string(),
@@ -73,7 +87,7 @@ impl AppState {
             db,
             jwt_keys,
             reg_key,
-            _current_quote,
+            current_quote,
         }
     }
 }
@@ -226,6 +240,7 @@ async fn serve() -> Result<(), Box<dyn std::error::Error>> {
 
     // Build the app router. Connections to the styling, favicon, static files, etc.
     let app = axum::Router::new()
+        .route("/", routing::get(web::get_quote))
         .merge(swagger_ui)
         .merge(redoc_ui)
         .merge(rapidoc_ui)
